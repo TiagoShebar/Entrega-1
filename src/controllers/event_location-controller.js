@@ -1,4 +1,4 @@
-//PUNTO 13
+//PUNTO 13, fijarse si funciona y si se ejcuta en algun momento
 import express from "express";
 import { EventLocationService } from "../services/event_location-service.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";

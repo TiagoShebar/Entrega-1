@@ -1,4 +1,4 @@
-//PUNTO 13
+//PUNTO 13, fijarse si funciona y si se ejcuta en algun momento
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 
