@@ -16,7 +16,7 @@ app.use("/api/province", ProvincesController);
 app.use("/api/event-category", EventCategoryController); 
 app.use("/api/location", LocationController); 
 app.use("/api/event-location", EventLocationController);
-//app.use(ErrorMiddleware);
+//app.use(ErrorMiddleware); //Middleware para manejar errores, no hace falta usarlo
 app.listen(port, () => {
     console.log(`Server is runing on port ${port}`);
 })
