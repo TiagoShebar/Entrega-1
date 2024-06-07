@@ -208,7 +208,6 @@ router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
             //PUNTO 9
             /*
     try {
-        // Insertar la inscripción
         const enrollmentInserted = await eventService.insertEnrollment(id_event, id_user);
         if (enrollmentInserted) {
             return res.status(201).send({ message: "Usuario inscrito correctamente." });

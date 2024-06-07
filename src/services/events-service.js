@@ -6,7 +6,6 @@ export class EventsService {
     constructor() {
         this.bd = new EventRepository();
     }
-
     async getEvent(offset, limit, tag, start_date, name, category, url){
 
         const regexFecha = /^\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2}:\d{2})?$/;
@@ -141,7 +140,6 @@ validateEvent(event) {
     }
     return null;
 }
-
 */
     async updateEvent(event, userId){
         const mensaje = this.verificarEvento(e);
@@ -201,8 +199,6 @@ async updateEnrollment(id_event, enrollment_id, id_user, rating, observations) {
     }
 }
 */
-
-
     insertEnrollment(id_event, id_user){
         const resultado = this.bd.insertEnrollment(id_event, id_user);
         if(resultado != null && !resultado){
@@ -253,9 +249,6 @@ async updateEnrollment(id_event, enrollment_id, id_user, rating, observations) {
             console.error("Error al actualizar los datos del usuario:", error);
             return false; // Error al actualizar los datos del usuario
         }
-    }
-    
+    }   
     */
-
-
 }

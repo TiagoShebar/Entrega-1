@@ -38,16 +38,8 @@ export class EventCategoryService {
     async deleteEventCategory(id){
 
     }
-}
-//PUNTO 12
+    //PUNTO 12
 /*
-import { EventCategoryRepository } from "../../repositories/event_category-repository.js";
-
-export class EventCategoryService {
-    constructor() {
-        this.eventCategoryRepository = new EventCategoryRepository();
-    }
-
     async getEventCategory(limit, offset, nextPage) {
         const [eventCategories, totalCount] = await this.eventCategoryRepository.getEventCategory(limit, offset);
         const pagination = {
@@ -70,5 +62,15 @@ export class EventCategoryService {
         return await this.eventCategoryRepository.createEventCategory(eventCategory);
     }
 
-    async updateEventCategory
-*/
+    async updateEventCategory(id, eventCategory) {
+    if (!eventCategory.name || eventCategory.name.length < 3) {
+        throw new Error("El nombre debe tener al menos tres caracteres.");
+    }
+    return await this.eventCategoryRepository.updateEventCategory(id, eventCategory);
+    }
+
+    async deleteEventCategory(id) {
+        return await this.eventCategoryRepository.deleteEventCategory(id);
+    }
+    */
+}

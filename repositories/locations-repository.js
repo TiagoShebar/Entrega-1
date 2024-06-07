@@ -11,13 +11,6 @@ export class LocationRepository {
 
 //PUNTO 11
 /*
-export class LocationRepository {
-    constructor() {
-        const { Client } = pg;
-        this.DBClient = new Client(DBConfig);
-        this.DBClient.connect();
-    }
-
     async getLocationById(id) {
         const query = "SELECT * FROM locations WHERE id = $1";
         const result = await this.DBClient.query(query, [id]);

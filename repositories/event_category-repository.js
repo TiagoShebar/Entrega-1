@@ -10,16 +10,6 @@ export class EventCategoryRepository {
 }
 // PUNTO 12
 /*
-import pg from 'pg';
-import { DBConfig } from "./dbconfig.js";
-
-export class EventCategoryRepository {
-    constructor() {
-        const { Client } = pg;
-        this.DBClient = new Client(DBConfig);
-        this.DBClient.connect();
-    }
-
     async getEventCategory(limit, offset) {
         const query = `SELECT * FROM event_categories LIMIT $1 OFFSET $2`;
         const result = await this.DBClient.query(query, [limit, offset]);

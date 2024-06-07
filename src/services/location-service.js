@@ -11,11 +11,6 @@ export class LocationService {
 
 //PUNTO 11
 /*
-export class LocationService {
-    constructor() {
-        this.locationRepository = new LocationRepository();
-    }
-
     async getLocationById(id) {
         return await this.locationRepository.getLocationById(id);
     }
@@ -24,5 +19,4 @@ export class LocationService {
         return await this.locationRepository.getEventLocationsByLocationId(locationId);
     }
 }
-
 */
