@@ -215,6 +215,13 @@ export class EventRepository {
         const values = [id, userId];
         return await this.DBClient.query(query, values);
     }
+    //PUNTO 9
+    /*
+    async removeEnrollment(id_event, id_user) {
+    const result = await this.DBClient.query("DELETE FROM event_enrollments WHERE id_event = $1 AND id_user = $2", [id_event, id_user]);
+    return result.rowCount > 0; // Devuelve true si se eliminó la inscripción, false si no
+}
+    */
 
     async insertEnrollment(id_event, id_user){
         const existe = await this.DBClient.query(("SELECT id FROM event_enrollments WHERE id_event = $1 AND id_user = $2"), [id_event, id_user]);

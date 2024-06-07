@@ -8,3 +8,21 @@ export class LocationService {
 
 
 }
+
+//PUNTO 11
+/*
+export class LocationService {
+    constructor() {
+        this.locationRepository = new LocationRepository();
+    }
+
+    async getLocationById(id) {
+        return await this.locationRepository.getLocationById(id);
+    }
+
+    async getEventLocationsByLocationId(locationId) {
+        return await this.locationRepository.getEventLocationsByLocationId(locationId);
+    }
+}
+
+*/

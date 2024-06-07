@@ -133,6 +133,46 @@ export class EventsService {
         }
         return false;
     }
+    //PUNTO 9
+    /*
+    try {
+            // Verificar si el evento ya ocurrió
+            const eventInfo = await this.bd.query("SELECT start_date FROM events WHERE id = $1", [id_event]);
+            if (eventInfo.rows.length === 0 || eventInfo.rows[0].start_date <= new Date()) {
+                return false; // El evento ya ocurrió o no existe
+            }
+
+            // Eliminar la inscripción del usuario en el evento
+            const result = await this.bd.query("DELETE FROM event_enrollments WHERE id_event = $1 AND id_user = $2", [id_event, id_user]);
+            return result.rowCount > 0; // Devuelve true si se eliminó la inscripción, false si no
+        } catch (error) {
+            console.error("Error al eliminar la inscripción del evento:", error);
+            return false; // Error al eliminar la inscripción
+        }
+    }
+    */
+
+
+    //PUNTO 10
+/*
+async updateEnrollment(id_event, enrollment_id, id_user, rating, observations) {
+    try {
+        // Verificar si el evento ya ocurrió
+        const eventInfo = await this.bd.query("SELECT start_date FROM events WHERE id = $1", [id_event]);
+        if (eventInfo.rows.length === 0 || eventInfo.rows[0].start_date > new Date()) {
+            return false; // El evento no ha finalizado aún
+        }
+
+        // Actualizar el event_enrollment con el rating y el feedback
+        const result = await this.bd.query("UPDATE event_enrollments SET rating = $1, observations = $2 WHERE id = $3 AND id_event = $4 AND id_user = $5", [rating, observations, enrollment_id, id_event, id_user]);
+        return result.rowCount > 0; // Devuelve true si se actualizó la inscripción, false si no
+    } catch (error) {
+        console.error("Error al actualizar la inscripción del evento:", error);
+        return false; // Error al actualizar la inscripción
+    }
+}
+*/
+
 
     insertEnrollment(id_event, id_user){
         const resultado = this.bd.insertEnrollment(id_event, id_user);
@@ -149,6 +189,44 @@ export class EventsService {
         }
         return false;
     }
+    //PUNTO 9
+    /*
+    async insertEnrollment(id_event, id_user) {
+        try {
+            // Verificar si el usuario ya está inscrito en el evento
+            const existe = await this.bd.query("SELECT id FROM event_enrollments WHERE id_event = $1 AND id_user = $2", [id_event, id_user]);
+            if (existe && existe.rows.length > 0) {
+                return false; // El usuario ya está inscrito en el evento
+            }
+
+            // Insertar la inscripción
+            const sql = "INSERT INTO event_enrollments (id_event, id_user, registration_date_time) VALUES ($1, $2, CURRENT_TIMESTAMP)";
+            await this.bd.query(sql, [id_event, id_user]);
+            return true; // Inscripción exitosa
+        } catch (error) {
+            console.error("Error al insertar la inscripción:", error);
+            return false; // Error al insertar la inscripción
+        }
+    }
+
+    async uploadUserStuff(id_event, id_user, description, attended, observations, rating) {
+        try {
+            // Verificar si el evento ya ocurrió
+            const existe = await this.bd.query("SELECT ee.id, e.start_date FROM event_enrollments ee INNER JOIN events e ON ee.id_event = e.id_event WHERE ee.id_event = $1 AND ee.id_user = $2", [id_event, id_user]);
+            const hoy = new Date();
+            if (existe && existe.rows.length > 0 && existe.rows[0].start_date < hoy) {
+                const sql = "UPDATE event_enrollments SET description = $1, attended = $2, observations = $3, rating = $4 WHERE id_event = $5 AND id_user = $6";
+                await this.bd.query(sql, [description, attended, observations, rating, id_event, id_user]);
+                return true; // Actualización exitosa
+            }
+            return false; // El evento ya ocurrió o no existe la inscripción
+        } catch (error) {
+            console.error("Error al actualizar los datos del usuario:", error);
+            return false; // Error al actualizar los datos del usuario
+        }
+    }
+    
+    */
 
 
 }

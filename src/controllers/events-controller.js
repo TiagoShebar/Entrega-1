@@ -134,6 +134,54 @@ router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     }
     return res.status(400).send("Error en los campos");
 });
+//PUNTO 9
+/*
+ try {
+        // Eliminar la inscripción del evento
+        const enrollmentRemoved = await eventService.removeEnrollment(id_event, id_user);
+        if (enrollmentRemoved) {
+            return res.status(200).send({ message: "Usuario eliminado del evento correctamente." });
+        } else {
+            return res.status(400).send("No se pudo completar la eliminación.");
+        }
+    } catch (error) {
+        console.error("Error al procesar la solicitud:", error);
+        return res.status(500).send("Error interno del servidor.");
+    }
+*/
+
+
+//PUNTO 10
+/*
+router.patch("/:id/enrollment/:enrollment_id", AuthMiddleware, async (req, res) => {
+    const id_event = req.params.id;
+    const id_user = req.user.id;
+    const enrollment_id = req.params.enrollment_id;
+    const { observations } = req.body;
+    const rating = parseInt(req.body.rating); // Convertir el rating a un número entero
+
+    try {
+        // Validar que el rating esté en el rango válido (entre 1 y 10)
+        if (rating < 1 || rating > 10) {
+            return res.status(400).send("El rating debe estar entre 1 y 10.");
+        }
+
+        // Actualizar el event_enrollment con el rating y el feedback
+        const enrollmentUpdated = await eventService.updateEnrollment(id_event, enrollment_id, id_user, rating, observations);
+        if (enrollmentUpdated) {
+            return res.status(200).send({ message: "Evento rankeado correctamente." });
+        } else {
+            return res.status(400).send("No se pudo completar la actualización.");
+        }
+    } catch (error) {
+        console.error("Error al procesar la solicitud:", error);
+        return res.status(500).send("Error interno del servidor.");
+    }
+});
+
+
+*/
+
 
 router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
     const id=req.params.id;
@@ -145,7 +193,7 @@ router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
 
     if(id_user && description && attended && observations && rating){
         const eventoActualizado = await eventService.uploadUserStuff(id, id_user, description, attended, observations, rating);
-        if(eventoActualizado){
+        if(eventoActualizado){//retornar 201 si se pudo registrar
             return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
                 valido: "enrollment actualizado correctamente"
             });
@@ -157,6 +205,21 @@ router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
             return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
                 valido: "usuario inscripto correctamente"
             });
+            //PUNTO 9
+            /*
+    try {
+        // Insertar la inscripción
+        const enrollmentInserted = await eventService.insertEnrollment(id_event, id_user);
+        if (enrollmentInserted) {
+            return res.status(201).send({ message: "Usuario inscrito correctamente." });
+        } else {
+            return res.status(400).send("No se pudo completar la inscripción.");
+        }
+    } catch (error) {
+        console.error("Error al procesar la solicitud:", error);
+        return res.status(500).send("Error interno del servidor.");
+    }
+            */
         }
     }
     return res.status(400).send("Error");

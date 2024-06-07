@@ -14,7 +14,7 @@ app.use("/api/user", UsersController);
 app.use("/api/province", ProvincesController); 
 app.use("/api/event-category", EventCategoryController); 
 app.use("/api/location", LocationController); 
-
+//app.use(ErrorMiddleware);
 app.listen(port, () => {
     console.log(`Server is runing on port ${port}`);
 })
