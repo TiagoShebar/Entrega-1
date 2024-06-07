@@ -230,6 +230,8 @@ async updateEvent(event, userId) {
 
     async deleteEvent(id, userId){
         const query = "DELETE FROM events WHERE id = $1 and id_creator_user = $2";
+//IMPORTANTE:
+//SEGUN OSTRO VA A DAR ERROR PORQUE EL ID_CREATOR SE USE EN MUCHAS PARTES Y SI LO BOORAS CRASHEA POR EL METODO CASCADA O ALGO ASI
         const values = [id, userId];
         return await this.DBClient.query(query, values);
     }
