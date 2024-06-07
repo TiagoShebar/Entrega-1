@@ -209,6 +209,24 @@ export class EventRepository {
             return [200, null];
         }
     }
+    //PUNTO 8. Verificar que esto funcione. Me pa que está mal
+    /*
+    async createEvent(event) {
+    const max_capacity = await this.getMaxCapacity(event.id_event_location);
+    if (event.max_assistance > max_capacity) {
+        return [400, "El max_assistance es mayor que el max_capacity del id_event_location."];
+    }
+    // Implementa el resto de la lógica para insertar el evento en la base de datos
+}
+
+async updateEvent(event, userId) {
+    const max_capacity = await this.getMaxCapacity(event.id_event_location);
+    if (event.max_assistance > max_capacity) {
+        return [400, "El max_assistance es mayor que el max_capacity del id_event_location."];
+    }
+    // Implementa el resto de la lógica para actualizar el evento en la base de datos
+}
+    */
 
     async deleteEvent(id, userId){
         const query = "DELETE FROM events WHERE id = $1 and id_creator_user = $2";

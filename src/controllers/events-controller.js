@@ -225,5 +225,75 @@ router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
     return res.status(400).send("Error");
 });
 
+//PUNTO 8
+/*
+router.post("/", AuthMiddleware, async (req, res) => {
+    const event = {
+        name: req.body.name,
+        description: req.body.description,
+        id_event_category: req.body.id_event_category,
+        id_event_location: req.body.id_event_location,
+        start_date: req.body.start_date,
+        duration_in_minutes: req.body.duration_in_minutes,
+        price: req.body.price,
+        enabled_for_enrollment: req.body.enabled_for_enrollment,
+        max_assistance: req.body.max_assistance,
+        id_creator_user: req.body.id_creator_user
+    };
+
+    const errorMessage = validarEvento(event);
+    if (errorMessage) {
+        return res.status(400).send(errorMessage);
+    }
+
+    const [statusCode, message] = await eventService.createEvent(event);
+    return res.status(statusCode).send(message);
+});
+
+router.put("/:id", AuthMiddleware, async (req, res) => {
+    const userId = req.user.id;
+    const eventId = req.params.id;
+    const event = {
+        id: eventId,
+        name: req.body.name,
+        description: req.body.description,
+        id_event_category: req.body.id_event_category,
+        id_event_location: req.body.id_event_location,
+        start_date: req.body.start_date,
+        duration_in_minutes: req.body.duration_in_minutes,
+        price: req.body.price,
+        enabled_for_enrollment: req.body.enabled_for_enrollment,
+        max_assistance: req.body.max_assistance,
+        id_creator_user: req.body.id_creator_user
+    };
+
+    const errorMessage = validarEvento(event);
+    if (errorMessage) {
+        return res.status(400).send(errorMessage);
+    }
+
+    const [statusCode, message] = await eventService.updateEvent(event, userId);
+    return res.status(statusCode).send(message);
+});
+
+router.delete("/:id", AuthMiddleware, async (req, res) => {
+    const eventId = req.params.id;
+    const userId = req.user.id;
+
+    const statusCode = await eventService.deleteEvent(eventId, userId);
+    return res.status(statusCode).send();
+});
+
+function validarEvento(event) {
+    if (!event.name || !event.description || event.name.length < 3 || event.description.length < 3) {
+        return "El nombre o la descripción están vacíos o tienen menos de tres (3) letras.";
+    }
+    if (event.price < 0 || event.duration_in_minutes < 0) {
+        return "El precio o la duración en minutos son menores que cero.";
+    }
+    return null;
+}
+
+*/
 
 export default router;
