@@ -1,25 +1,17 @@
 import { query } from "express";
 import { EventCategoryRepository } from "../../repositories/event_category-repository.js";
+import { Pagination } from "../entities/pagination.js"
 
 export class EventCategoryService {
     constructor() {
         this.bd = new EventCategoryRepository();
     }
 
-    async getEvent_Category(limit, offset){
-        const [event_categories,totalCount] = await this.bd.getEvent_Category(limit, offset, nextPage);
-        const resultado = {
-            
-                collection: event_categories,
-                pagination:
-                    {
-                        limit: limit,
-                        offset: offset,
-                        nextPage: (((offset+1)*limit <= totalCount) ? `${process.env.DB_USER}${nextPage}`:null),
-                        total: totalCount
-                    }
-                };
-        return resultado;
+    async getAllEvent_Category(limit, offset, url){
+        limit = Pagination.ParseLimit(limit);
+        offset = Pagination.ParseOffset(offset);
+        const [event_categories,totalCount] = await this.bd.getAllEvent_Category(limit, offset);
+        return Pagination.BuildPagination(event_categories, limit, offset, url, totalCount);
     }
 
     async getEvent_CategoryById(id){
@@ -28,7 +20,17 @@ export class EventCategoryService {
     }
 
     async createEventCategory(event_category){
-         
+        if(this.verificarLength(event_category.name)){
+            return false;
+        }
+        else{
+            const creation = await this.bd.createEventCategory(event_category);
+            return creation;
+        }
+    }
+
+    verificarLength(name){
+        return name.length >= 3;
     }
 
     async updateEventCategory(id){

@@ -8,16 +8,14 @@ const router = express.Router();
 const eventCategoryService = new EventCategoryService();
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit ?? null;
-    const offset = req.query.offset ?? 1;
-
-    const nextPage = req.originalUrl.replace(/(offset=)\d+/, 'offset=' + (parseInt(offset) + 1));
+    const limit = req.query.limit;
+    const offset = req.query.offset;
 
     try{
-        const allEventCategories = await eventCategoryService.getEvent_Category(limit, offset, nextPage);
-        return res.status(200).send("ok"), json(allEventCategories);
-    }catch { 
-        return res.status(400).send(error);
+        const allEventCategories = await eventCategoryService.getEvent_Category(limit, offset, req.originalUrl);
+        return res.status(200).json(allEventCategories);
+    }catch (e){ 
+        return res.status(400).send(e);
     }
     
 });
@@ -25,11 +23,14 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         const event_category = await eventCategoryService.getEvent_CategoryById(req.params.id);
-        if(event_category){
-            return res.status(200), json(event_category);
+        if(!event_category){
+            return res.status(400).send(mensaje);
+        }
+        else if(event_category == null){
+            return res.status(200).json(event_category);
         }
         else{
-            return res.status(404);
+            return res.status(404).send();
         }
     }
     catch {
@@ -44,9 +45,9 @@ router.post("/", AuthMiddleware, async (req, res) => {
         display_order: req.body.display_order
     }
 
-    if(verificarObjeto(event_category)){
+    /*if(verificarObjeto(event_category)){
 
-    }
+    }*/
     try {
         const event_categoryCreado = await EventCategoryService.createEventCategory(event_category);
         return res.status(201);

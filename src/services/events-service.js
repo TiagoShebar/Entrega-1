@@ -102,10 +102,10 @@ export class EventsService {
     }
 
     verificarEvento(e) {
-        if(e.name !== undefined && e.name < 3 || e.description !== undefined && e.description < 3){
+        if(e.name !== undefined && e.name.length < 3 || e.description !== undefined && e.description.length < 3){
             return "El name o description están vacíos o tienen menos de tres (3) letras.";
         }
-        else if(e.price !== undefined && e.price || e.duration_in_minutes !== undefined && e.duration_in_minutes < 0){
+        else if(e.price !== undefined && e.price < 0|| e.duration_in_minutes !== undefined && e.duration_in_minutes < 0){
             return "El price o duration_in_minutes son menores que cero.";
         }
         else{
@@ -142,7 +142,7 @@ validateEvent(event) {
 }
 */
     async updateEvent(event, userId){
-        const mensaje = this.verificarEvento(e);
+        const mensaje = this.verificarEvento(event);
         if(mensaje == null){
             const [statusCode, mensaje] = await this.bd.updateEvent(event, userId);
             return [statusCode, mensaje];

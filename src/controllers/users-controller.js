@@ -80,7 +80,7 @@ const revisarCampos = (user) => {
         return "La contraseña debe tener al menos 3 caracteres";
     }
     else{
-        return true;
+        return null;
     }
 }
 

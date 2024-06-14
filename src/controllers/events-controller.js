@@ -2,6 +2,7 @@ import express from "express";
 import {EventsService} from "../services/events-service.js";
 import { AuthMiddleware } from "../auth/authMiddleware.js";
 import { verificarObjeto } from "../utils/objetoVerificacion.js";
+import { Event } from "../entities/event.js";
 
 const router = express.Router();
 const eventService = new EventsService();
@@ -74,19 +75,19 @@ router.get("/:id/enrollment", async (req, res) => {
 });
 
 router.post("/", AuthMiddleware, async (req, res) => {
-    const event = new Event();
-    event = {
-        name: req.body.name,
-        description: req.body.description,
-        id_event_category: req.body.id_event_category,
-        id_event_location: req.body.id_event_location,
-        start_date: req.body.start_date,
-        duration_in_minutes: req.body.duration_in_minutes,
-        price: req.body.price,
-        enabled_for_enrollment: req.body.enabled_for_enrollment,
-        max_assistance: req.body.max_assistance,
-        id_creator_user: req.body.id_creator_user
-    }
+    const event = new Event(
+        null,
+        req.body.name,
+        req.body.description,
+        req.body.id_event_category,
+        req.body.id_event_location,
+        req.body.start_date,
+        req.body.duration_in_minutes,
+        req.body.price,
+        req.body.enabled_for_enrollment,
+        req.body.max_assistance,
+        req.body.id_creator_user
+    );
     
     if(verificarObjeto(event)){
         const [statusCode, mensaje] = await eventService.createEvent(event);
@@ -100,21 +101,20 @@ router.post("/", AuthMiddleware, async (req, res) => {
 
 router.put("/", AuthMiddleware, async (req,res) =>{
     const userId = req.user.id;
-    const event = new Event();
-    event = {
-        id: req.body.id,
-        name: req.body.name,
-        description: req.body.description,
-        id_event_category: req.body.id_event_category,
-        id_event_location: req.body.id_event_location,
-        start_date: req.body.start_date,
-        duration_in_minutes: req.body.duration_in_minutes,
-        price: req.body.price,
-        enabled_for_enrollment: req.body.enabled_for_enrollment,
-        max_assistance: req.body.max_assistance,
-        id_creator_user: req.body.id_creator_user
-    }
-    if(id === undefined){
+    const event = new Event(
+        req.body.id,
+        req.body.name,
+        req.body.description,
+        req.body.id_event_category,
+        req.body.id_event_location,
+        req.body.start_date,
+        req.body.duration_in_minutes,
+        req.body.price,
+        req.body.enabled_for_enrollment,
+        req.body.max_assistance,
+        req.body.id_creator_user
+    );
+    if(event.id === undefined){
         return res.status(400).send();
     }
     else{
@@ -127,8 +127,10 @@ router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     const id=req.params.id;
     const userId = req.user.id;
     const [eventoEliminado,statusCode, mensaje] = await eventService.deleteEvent(id, userId);
+    
     if(eventoEliminado > 0){
-        return res.status(200).send(eventoEliminado);
+
+        return res.status(200).json(eventoEliminado);
     }
     else{
         return res.status(statusCode).send(mensaje);

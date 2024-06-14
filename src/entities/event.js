@@ -1,5 +1,5 @@
 export class Event {
-    constructor(id, name, description, date, location, image, province_id) {
+    constructor(id, name, description, id_event_category, id_event_location, start_date, duration_in_minutes, price, enabled_for_enrollment, max_assistance, id_creator_user) {
         this.id = id;
         this.name = name;
         this.description = description;

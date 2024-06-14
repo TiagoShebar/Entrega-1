@@ -149,21 +149,27 @@ export class EventRepository {
     }
 
     async createEvent(event){
-        const max_capacity = await this.traerMaxCapacity(event.id_event_location);
-        if(event.max_assistance <= max_capacity){
-            const query = "INSERT INTO events (name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max_assistance,id_creator_user) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)";
-            const values = [event.name, event.description, event.id_event_category, event.id_event_location, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrrolment, event.max_assistance, event.id_creator_user];
-            const resultado = await this.DBClient.query(query, values);
-            if(resultado.rowCount > 0){
-                return [201, null];
+        try{
+            const max_capacity = await this.traerMaxCapacity(event.id_event_location);
+            if(max_capacity === undefined || event.max_assistance <= max_capacity){
+                const query = "INSERT INTO events (name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max_assistance,id_creator_user) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)";
+                const values = [event.name, event.description, event.id_event_category, event.id_event_location, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrrolment, event.max_assistance, event.id_creator_user];
+                const resultado = await this.DBClient.query(query, values);
+                if(resultado.rowCount > 0){
+                    return [201, null];
+                }
+                else{
+                    return [400, null];
+                }
             }
             else{
-                return [400, null];
+                return [400, "El max_assistance es mayor que el max_capacity del id_event_location."];
             }
         }
-        else{
-            return [400, "El max_assistance es mayor que el max_capacity del  id_event_location."];
+        catch(error){
+            return [400, error.detail];
         }
+        
        
     }
 
@@ -171,46 +177,50 @@ export class EventRepository {
         const query = "SELECT max_capacity FROM event_locations WHERE id = $1";
         const values = [id];
         const max_capacity = await this.DBClient.query(query, values);
-        return max_capacity;
+        return max_capacity.rows[0] === undefined ? max_capacity.rows[0] : max_capacity.rows[0].max_capacity;
     }
 
     async updateEvent(event, userId){
-
-        const max_capacity = await this.traerMaxCapacity(event.id_event_location);
-        if(event.max_assistance > max_capacity){
-            return [400, "El max_assistance es mayor que el max_capacity del  id_event_location."]
-        }
-
-        var sql;
-        sql = `SELECT id from events WHERE id=$1 AND id_creator_user=$2`;
-        var values = [event.id, userId];
-        var respuesta = await this.DBClient.query(sql,values);
-
-        if(respuesta.rowCount == 0){
-            return [404, "el id del evento no existe, o el evento no pertenece al usuario autenticado."];
-        }
-        else{
-            const attributes = [];
-        
-            if(event.name) attributes.push(`name = ${event.name}`);
-            if(event.description) attributes.push(`description = ${event.description}`);
-            if(event.id_event_category) attributes.push(`id_event_category = ${event.id_event_category}`);
-            if(event.id_event_location) attributes.push(`id_event_location = ${event.id_event_location}`);
-            if(event.start_date) attributes.push(`start_date = ${event.start_date}`);
-            if(event.duration_in_minutes) attributes.push(`duration_in_minutes = ${event.duration_in_minutes}`);
-            if(event.price) attributes.push(`price = ${event.price}`);
-            if(event.enabled_for_enrollment) attributes.push(`enabled_for_enrollment = ${event.enabled_for_enrollment}`);
-            if(event.max_assistance) attributes.push(`max_assistance = ${event.max_assistance}`);
-            if(event.id_creator_user) attributes.push(`id_creator_user = ${event.id_creator_user}`);
-
-            if(attributes.length > 0){
-                sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1 AND id_creator_user=$2`;
-                values = [event.id, userId];
-                respuesta = await this.DBClient.query(sql,values);
+        try {
+            const max_capacity = await this.traerMaxCapacity(event.id_event_location);
+            if(event.max_assistance > max_capacity){
+                return [400, "El max_assistance es mayor que el max_capacity del  id_event_location."]
             }
-            return [200, null];
+    
+            var sql;
+            sql = `SELECT id from events WHERE id=$1 AND id_creator_user=$2`;
+            var values = [event.id, userId];
+            var respuesta = await this.DBClient.query(sql,values);
             
+            if(respuesta.rowCount == 0){
+                return [404, "el id del evento no existe, o el evento no pertenece al usuario autenticado."];
+            }
+            else {
+                const attributes = [];
+            
+                if (event.name) attributes.push(`name = '${event.name}'`);
+                if (event.description) attributes.push(`description = '${event.description}'`);
+                if (event.id_event_category) attributes.push(`id_event_category = ${event.id_event_category}`);
+                if (event.id_event_location) attributes.push(`id_event_location = ${event.id_event_location}`);
+                if (event.start_date) attributes.push(`start_date = '${event.start_date}'`);
+                if (event.duration_in_minutes) attributes.push(`duration_in_minutes = ${event.duration_in_minutes}`);
+                if (event.price) attributes.push(`price = ${event.price}`);
+                if (event.enabled_for_enrollment) attributes.push(`enabled_for_enrollment = ${event.enabled_for_enrollment}`);
+                if (event.max_assistance) attributes.push(`max_assistance = ${event.max_assistance}`);
+                if (event.id_creator_user) attributes.push(`id_creator_user = ${event.id_creator_user}`);
+            
+                if (attributes.length > 0) {
+                    sql = `UPDATE events SET ${attributes.join(', ')} WHERE id = $1 AND id_creator_user = $2`;
+                    values = [event.id, userId];
+                    respuesta = await this.DBClient.query(sql, values);
+                }
+                return [200, null];
+            }
         }
+        catch (error){
+            return [400, error];
+        }
+        
     }
         
         
@@ -238,24 +248,24 @@ async updateEvent(event, userId) {
 
         var sql = "SELECT id FROM events WHERE id = $1 AND id_creator_user = $2";
         var values = [id, userId];
-        var respuesta = await this.DBClient.query(query, values);
+        var respuesta = await this.DBClient.query(sql, values);
         if(respuesta.rowCount == 0){
             return [0, 404, "el id del evento no existe, o el evento no pertenece al usuario autenticado."];
         }
         else{
             sql = "SELECT id FROM event_enrollments WHERE id_event = $1";
             values = [id];
-            respuesta = await this.DBClient.query(query, values);
+            respuesta = await this.DBClient.query(sql, values);
             if(respuesta.rowCount > 0){
                 return [0, 400, "El evento tiene inscripciones."];
             }
             else{
                 sql = "DELETE FROM event_tags WHERE id_event = $1";
                 values = [id];
-                respuesta = await this.DBClient.query(query, values);
+                respuesta = await this.DBClient.query(sql, values);
                 sql = "DELETE FROM events WHERE id = $1 and id_creator_user = $2";
                 values = [id, userId];
-                respuesta = await this.DBClient.query(query, values);
+                respuesta = await this.DBClient.query(sql, values);
                 return [respuesta.rowCount, 200, null];
                 
             }
@@ -274,34 +284,40 @@ async updateEvent(event, userId) {
     */
 
     async insertEnrollment(id_event, id_user){
-        var sql = "SELECT * FROM event WHERE id = $1";
-        var values = [id_event];
-        const evento = await this.DBClient.query(sql, values);
-        if(evento == null){
-            return [404, null];
-        }
-        else{
-            if(evento.rows[0].start_date <= new Date()){
-                return [400, "El evento ya ocurrió"];
-            }
-            else if(evento.rows[0].enabled_for_enrollment == false){
-                return [400, "El evento no está habilitado para inscripciones"];
+        try{
+            var sql = "SELECT * FROM event WHERE id = $1";
+            var values = [id_event];
+            const evento = await this.DBClient.query(sql, values);
+            if(evento == null){
+                return [404, null];
             }
             else{
-                sql = "SELECT COUNT(id) FROM event_enrollments WHERE id_event = $1";
-                values = [id_event];
-                const cantidad = await this.DBClient.query(sql, values);
-                if(cantidad < evento.rows[0].max_assistance){
-                    sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
-                    values = [id_event, id_user];
-                    const insert = await this.DBClient.query(sql, values);
-                    return [200, null];
+                if(evento.rows[0].start_date <= new Date()){
+                    return [400, "El evento ya ocurrió"];
+                }
+                else if(evento.rows[0].enabled_for_enrollment == false){
+                    return [400, "El evento no está habilitado para inscripciones"];
                 }
                 else{
-                    return [400, "El evento ya alcanzó su máxima capacidad"];
+                    sql = "SELECT COUNT(id) FROM event_enrollments WHERE id_event = $1";
+                    values = [id_event];
+                    const cantidad = await this.DBClient.query(sql, values);
+                    if(cantidad < evento.rows[0].max_assistance){
+                        sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
+                        values = [id_event, id_user];
+                        const insert = await this.DBClient.query(sql, values);
+                        return [200, null];
+                    }
+                    else{
+                        return [400, "El evento ya alcanzó su máxima capacidad"];
+                    }
                 }
             }
         }
+        catch(error){
+            return [400, error.detail];
+        }
+        
     }
 
     async deleteEnrollment(id_event, id_user){  
@@ -329,7 +345,7 @@ async updateEvent(event, userId) {
                         return [200, null];
                     }
                     else{
-                        return [400, null];
+                        return [400,null];
                     }
                 }
             }

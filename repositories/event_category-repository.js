@@ -7,6 +7,27 @@ export class EventCategoryRepository {
         this.DBClient = new Client(DBConfig);
         this.DBClient.connect();
     }
+
+    async getAllEvent_Category(limit, offset) {
+        var query = `SELECT * FROM event_categories LIMIT $1 OFFSET $2`;
+        const result = await this.DBClient.query(query, [limit, offset]);
+        query = `SELECT COUNT(id) FROM event_categories`;   
+        const totalCount = await this.DBClient.query(query);
+        return [result.rows, totalCount.rows.length];
+    }
+
+    async getEvent_CategoryById(id) {
+        const query = `SELECT * FROM event_categories WHERE id = $1`;
+        const result = await this.DBClient.query(query, [id]);
+        return result.rows[0];
+    }
+
+    async createEventCategory(event_category) {
+        const query = `INSERT INTO event_categories (name, display_order) VALUES ($1, $2)`;
+        const values = [event_category.name, event_category.display_order];
+        const result = await this.DBClient.query(query, values);
+        return result.rowCount;
+    }
 }
 // PUNTO 12
 /*

@@ -34,7 +34,7 @@ router.get("/:id", async (req, res) => {
     
 });
 
-router.get("/:id/event_location", async (req, res) => {
+router.get("/:id/event_location", AuthMiddleware, async (req, res) => {
     const limit = req.query.limit;
     const offset = req.query.offset;
 

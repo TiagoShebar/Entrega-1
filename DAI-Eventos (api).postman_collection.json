@@ -1,0 +1,273 @@
+{
+	"info": {
+		"_postman_id": "9f3557b8-6bd3-4d30-87b6-c31059c7d015",
+		"name": "DAI-Eventos (api)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Event",
+			"item": [
+				{
+					"name": "Enrollment",
+					"item": []
+				},
+				{
+					"name": "GetAllEvents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3508/api/event",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3508",
+							"path": [
+								"api",
+								"event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetEventFromID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3508/api/event/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3508",
+							"path": [
+								"api",
+								"event",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CrearEvento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Concierto de Verano\",\r\n  \"description\": \"Un concierto al aire libre en el parque\",\r\n  \"id_event_category\": 2,\r\n  \"id_event_location\": 1,\r\n  \"start_date\": \"2024-07-15T19:00:00\",\r\n  \"duration_in_minutes\": 120,\r\n  \"price\": 25.99,\r\n  \"enabled_for_enrollment\": true,\r\n  \"max_assistance\": 200,\r\n  \"id_creator_user\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{port}}/api/event",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateEvento",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"7\",\r\n  \"name\": \"Concierto de Verano\",\r\n  \"description\": \"Un concierto al aire libre en el parque\",\r\n  \"id_event_category\": 2,\r\n  \"id_event_location\": 1,\r\n  \"start_date\": \"2024-07-15T19:00:00\",\r\n  \"duration_in_minutes\": 120,\r\n  \"price\": 25.99,\r\n  \"enabled_for_enrollment\": true,\r\n  \"max_assistance\": 200,\r\n  \"id_creator_user\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{port}}/api/event",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteEvent",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJwb2xzaHVAcG9sc2h1LmNvbS5hciIsImlhdCI6MTcxODM3ODY4OCwiZXhwIjoxNzE4MzgyMjg4LCJpc3MiOiJsb2NhbGhvc3QifQ.DD12C9qAJlC8Zq-d_XiYNv6siU90ZsSB5TXO_Wodqz4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{port}}/api/event/14",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"event",
+								"14"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var res = pm.response.json();\r",
+									"pm.environment.set(\"token\", res.token);\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"polshu@polshu.com.ar\",\r\n    \"password\": \"pablito\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3508/api/user/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3508",
+							"path": [
+								"api",
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"eitan\",\r\n    \"last_name\": \"toporovskaja\",\r\n    \"username\": \"topoo@gmail.com\",\r\n    \"password\": \"topo2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3508/api/user/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3508",
+							"path": [
+								"api",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Province",
+			"item": []
+		},
+		{
+			"name": "Location",
+			"item": []
+		},
+		{
+			"name": "Event_Category",
+			"item": []
+		},
+		{
+			"name": "Event_Location",
+			"item": []
+		}
+	]
+}
