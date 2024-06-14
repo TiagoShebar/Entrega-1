@@ -12,7 +12,7 @@ router.get("/", AuthMiddleware, async (req, res) => {
         const allEventLocations = await eventLocationService.getAllEventLocations(userId);
         return res.status(200).json(allEventLocations);
     } catch (error) {
-        return res.status(500).send(error);
+        return res.status(400).send(error);
     }
 });
 
@@ -26,7 +26,7 @@ router.get("/:id", AuthMiddleware, async (req, res) => {
             return res.status(404).send("Not found");
         }
     } catch (error) {
-        return res.status(500).send(error);
+        return res.status(400).send(error);
     }
 });
 

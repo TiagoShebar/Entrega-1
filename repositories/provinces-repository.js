@@ -26,10 +26,18 @@ export class ProvinceRepository {
     }
 
     async deleteProvince(id) {
-        const sql = "DELETE FROM provinces WHERE id = $1";
-        const values = [id];
-        const eliminado = await this.DBClient.query(sql,values);
-        return eliminado;
+        var sql = "SELECT id from locations WHERE id_province = $1";
+        var values = [id];
+        const respuesta = await this.DBClient.query(sql,values);
+        if(respuesta.rowCount > 0){
+            return 0;
+        }
+        else{
+            sql = "DELETE FROM provinces WHERE id = $1";
+            const eliminado = await this.DBClient.query(sql,values);
+            return eliminado.rowCount;
+        }
+        
     }
 
     async updateProvince(province) {

@@ -65,8 +65,8 @@ router.put( "/", AuthMiddleware, async (req,res) =>{
 
 router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     const deleted = await provinceService.deleteProvince(req.params.id);
-    if(deleted){
-        return res.status(200).send();
+    if(deleted > 0){
+        return res.status(200).send(deleted);
     }
     else{
         return res.status(404).send();

@@ -91,7 +91,7 @@ export class EventsService {
 
     async createEvent(event){
         const mensaje = this.verificarEvento(event);
-        if(mensaje != null){
+        if(mensaje == null){
             const [statusCode, mensaje] = await this.bd.createEvent(event);
             return [statusCode, mensaje];
         }
@@ -143,7 +143,7 @@ validateEvent(event) {
 */
     async updateEvent(event, userId){
         const mensaje = this.verificarEvento(e);
-        if(mensaje != null){
+        if(mensaje == null){
             const [statusCode, mensaje] = await this.bd.updateEvent(event, userId);
             return [statusCode, mensaje];
         }
@@ -153,12 +153,9 @@ validateEvent(event) {
         
     }
 
-    deleteEvent(id, userId){
-        const resultado = this.bd.deleteEvent(id, userId);
-        if(resultado){
-            return true;
-        }
-        return false;
+    async deleteEvent(id, userId){
+        const [eventDeleted, statusCode, mensaje] = await this.bd.deleteEvent(id, userId);
+        return [eventDeleted, statusCode, mensaje];
     }
     //PUNTO 9
     /*
@@ -199,20 +196,19 @@ async updateEnrollment(id_event, enrollment_id, id_user, rating, observations) {
     }
 }
 */
-    insertEnrollment(id_event, id_user){
-        const resultado = this.bd.insertEnrollment(id_event, id_user);
-        if(resultado != null && !resultado){
-            return true;
-        }
-        return false;
+    async insertEnrollment(id_event, id_user){
+        const [statusCode, mensaje] = await this.bd.insertEnrollment(id_event, id_user);
+        return [statusCode, mensaje];
     }
 
-    uploadUserStuff(id, id_user, description, attended, observations, rating){
-        const resultado = this.bd.uploadUserStuff(id, id_user, description, attended, observations, rating);
-        if(resultado != null){
-            return true;
-        }
-        return false;
+    async deleteEnrollment(id_event, id_user){
+        const [statusCode, mensaje] = await this.bd.deleteEnrollment(id_event, id_user);
+        return [statusCode, mensaje];
+    }
+
+    async uploadUserStuff(id_event, id_user, observations, rating){
+        const [statusCode, mensaje] = this.bd.uploadUserStuff(id, id_user, observations, rating);
+        return [statusCode, mensaje];
     }
     //PUNTO 9
     /*

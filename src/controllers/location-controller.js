@@ -6,49 +6,49 @@ const router = express.Router();
 const locationService = new LocationService();
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit ?? null;
-    const offset = req.query.offset ?? 1;
-
-    const nextPage = req.originalUrl.replace(/(offset=)\d+/, 'offset=' + (parseInt(offset) + 1));
-    console.log(nextPage);
+    const limit = req.query.limit;
+    const offset = req.query.offset;
 
     try{
-        const allLocations = await locationService.getLocations(offset, limit, nextPage);
-        return res.status(200), json(allLocations);
+        const allLocations = await locationService.getAllLocations(offset, limit, req.originalUrl);
+        return res.status(200).json(allLocations);
     }catch { 
-        return res.status(500).send(error);
+        return res.status(400).send(error);
     }
     
 });
 
 router.get("/:id", async (req, res) => {
     try {
-        const location = await LocationService.getLocationById(req.params.id);
-        if(location){
-            return res.status(200), json(location);
+        const location = await locationService.getLocationById(req.params.id);
+        if(location != null){
+            return res.status(200).json(location);
         }
         else{
-            return res.status(404);
+            return res.status(404).send();
         }
     }
     catch {
-        return res.status(500).send(error);
+        return res.status(400).send(error);
     }
     
 });
 
 router.get("/:id/event_location", async (req, res) => {
+    const limit = req.query.limit;
+    const offset = req.query.offset;
+
     try {
-        const location = await LocationService.getLocationById(req.params.id);
-        if(location){
-            return res.status(200), json(location);
+        const event_locations = await locationService.getEventLocationsByIdLocation(limit, offset, req.originalUrl, req.params.id);
+        if(event_locations != -1){
+            return res.status(200).json(event_locations);
         }
         else{
-            return res.status(404);
+            return res.status(404).send();
         }
     }
     catch {
-        return res.status(500).send(error);
+        return res.status(400).send(error);
     }
     
 });

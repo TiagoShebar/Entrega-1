@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
     try{
         const allEvents = await eventService.getEvent(offset, limit, tag, start_date, name, category, req.originalUrl);
         if(allEvents){
-            return res.json(allEvents);
+            return res.status(200).json(allEvents);
         }
         else{
             return res.status(400).send();
@@ -98,11 +98,11 @@ router.post("/", AuthMiddleware, async (req, res) => {
     
 });
 
-router.put( "/:id", AuthMiddleware, async (req,res) =>{
+router.put("/", AuthMiddleware, async (req,res) =>{
     const userId = req.user.id;
     const event = new Event();
     event = {
-        id: req.event.id,
+        id: req.body.id,
         name: req.body.name,
         description: req.body.description,
         id_event_category: req.body.id_event_category,
@@ -126,13 +126,14 @@ router.put( "/:id", AuthMiddleware, async (req,res) =>{
 router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     const id=req.params.id;
     const userId = req.user.id;
-    const eventoEliminado = await eventService.deleteEvent(id, userId);
-    if(eventoEliminado){
-        return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
-            valido: "evento eliminado correctamente"
-        });
+    const [eventoEliminado,statusCode, mensaje] = await eventService.deleteEvent(id, userId);
+    if(eventoEliminado > 0){
+        return res.status(200).send(eventoEliminado);
     }
-    return res.status(400).send("Error en los campos");
+    else{
+        return res.status(statusCode).send(mensaje);
+    }
+    
 });
 //PUNTO 9
 /*
@@ -182,29 +183,28 @@ router.patch("/:id/enrollment/:enrollment_id", AuthMiddleware, async (req, res) 
 
 */
 
-
 router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
-    const id=req.params.id;
-    const description = req.query.description;
-    const attended = req.query.attended;
-    const observations = req.query.observations;
-    const rating = req.query.rating;
-    const id_user = req.body.id_user;
+    const userId = req.user.id;
+    const [statusCode, mensaje] = await eventService.insertEnrollment(req.params.id, userId);
+    return res.status(statusCode).send(mensaje);
+});
 
-    if(id_user && description && attended && observations && rating){
-        const eventoActualizado = await eventService.uploadUserStuff(id, id_user, description, attended, observations, rating);
-        if(eventoActualizado){//retornar 201 si se pudo registrar
-            return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
-                valido: "enrollment actualizado correctamente"
-            });
-        }
-    }
-    else if(id_user){
-        const enrollmentInsertado = await eventService.insertEnrollment(id, id_user);
-        if(enrollmentInsertado){
-            return res.status(232).send({//Los códigos de estado 227 a 299 no están asignados actualmente.
-                valido: "usuario inscripto correctamente"
-            });
+router.delete("/:id/enrollment", AuthMiddleware, async(req, res) => {
+    const userId = req.user.id;
+    const [statusCode, mensaje] = await eventService.deleteEnrollment(req.params.id, userId);
+    return res.status(statusCode).send(mensaje);
+});
+
+router.patch("/:id/enrollment/:rating", AuthMiddleware, async (req, res) => {
+    const id_event =req.params.id;
+    const observations = req.body.observations;
+    const rating = req.query.rating;
+    const userId = req.user.id;
+
+    const [statusCode, mensaje] = await eventService.uploadUserStuff(id_event, id_user, observations, rating);
+    return res.status(statusCode).send(mensaje);
+
+});
             //PUNTO 9
             /*
     try {
@@ -219,11 +219,7 @@ router.post("/:id/enrollment", AuthMiddleware, async (req, res) => {
         return res.status(500).send("Error interno del servidor.");
     }
             */
-        }
-    }
-    return res.status(400).send("Error");
-});
-
+        
 //PUNTO 8
 /*
 router.post("/", AuthMiddleware, async (req, res) => {

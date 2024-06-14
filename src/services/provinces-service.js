@@ -50,7 +50,7 @@ export class ProvincesService{
 
     async deleteProvince(id){
         const eliminado = await this.bd.deleteProvince(id);
-        return eliminado.rowCount > 0;
+        return eliminado;
     }
 
     async getAllProvinces(limit, offset, url){

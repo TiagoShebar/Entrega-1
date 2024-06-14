@@ -181,34 +181,40 @@ export class EventRepository {
             return [400, "El max_assistance es mayor que el max_capacity del  id_event_location."]
         }
 
-        const attributes = [];
-        
-        if(event.name) attributes.push(`name = ${event.name}`);
-        if(event.description) attributes.push(`description = ${event.description}`);
-        if(event.id_event_category) attributes.push(`id_event_category = ${event.id_event_category}`);
-        if(event.id_event_location) attributes.push(`id_event_location = ${event.id_event_location}`);
-        if(event.start_date) attributes.push(`start_date = ${event.start_date}`);
-        if(event.duration_in_minutes) attributes.push(`duration_in_minutes = ${event.duration_in_minutes}`);
-        if(event.price) attributes.push(`price = ${event.price}`);
-        if(event.enabled_for_enrollment) attributes.push(`enabled_for_enrollment = ${event.enabled_for_enrollment}`);
-        if(event.max_assistance) attributes.push(`max_assistance = ${event.max_assistance}`);
-        if(event.id_creator_user) attributes.push(`id_creator_user = ${event.id_creator_user}`);
-
         var sql;
-        if(attributes.length == 0){
-            sql = `SELECT id from events WHERE id=$1 AND id_creator_user=$2`;
-        }
-        else{
-            sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1 AND id_creator_user=$2`;
-        }
-        const values = [event.id, userId];
-        const respuesta = await this.DBClient.query(sql,values);
+        sql = `SELECT id from events WHERE id=$1 AND id_creator_user=$2`;
+        var values = [event.id, userId];
+        var respuesta = await this.DBClient.query(sql,values);
+
         if(respuesta.rowCount == 0){
             return [404, "el id del evento no existe, o el evento no pertenece al usuario autenticado."];
-        }else{
+        }
+        else{
+            const attributes = [];
+        
+            if(event.name) attributes.push(`name = ${event.name}`);
+            if(event.description) attributes.push(`description = ${event.description}`);
+            if(event.id_event_category) attributes.push(`id_event_category = ${event.id_event_category}`);
+            if(event.id_event_location) attributes.push(`id_event_location = ${event.id_event_location}`);
+            if(event.start_date) attributes.push(`start_date = ${event.start_date}`);
+            if(event.duration_in_minutes) attributes.push(`duration_in_minutes = ${event.duration_in_minutes}`);
+            if(event.price) attributes.push(`price = ${event.price}`);
+            if(event.enabled_for_enrollment) attributes.push(`enabled_for_enrollment = ${event.enabled_for_enrollment}`);
+            if(event.max_assistance) attributes.push(`max_assistance = ${event.max_assistance}`);
+            if(event.id_creator_user) attributes.push(`id_creator_user = ${event.id_creator_user}`);
+
+            if(attributes.length > 0){
+                sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1 AND id_creator_user=$2`;
+                values = [event.id, userId];
+                respuesta = await this.DBClient.query(sql,values);
+            }
             return [200, null];
+            
         }
     }
+        
+        
+        
     //PUNTO 8. Verificar que esto funcione. Me pa que está mal
     /*
     async createEvent(event) {
@@ -229,12 +235,35 @@ async updateEvent(event, userId) {
     */
 
     async deleteEvent(id, userId){
-        const query = "DELETE FROM events WHERE id = $1 and id_creator_user = $2";
+
+        var sql = "SELECT id FROM events WHERE id = $1 AND id_creator_user = $2";
+        var values = [id, userId];
+        var respuesta = await this.DBClient.query(query, values);
+        if(respuesta.rowCount == 0){
+            return [0, 404, "el id del evento no existe, o el evento no pertenece al usuario autenticado."];
+        }
+        else{
+            sql = "SELECT id FROM event_enrollments WHERE id_event = $1";
+            values = [id];
+            respuesta = await this.DBClient.query(query, values);
+            if(respuesta.rowCount > 0){
+                return [0, 400, "El evento tiene inscripciones."];
+            }
+            else{
+                sql = "DELETE FROM event_tags WHERE id_event = $1";
+                values = [id];
+                respuesta = await this.DBClient.query(query, values);
+                sql = "DELETE FROM events WHERE id = $1 and id_creator_user = $2";
+                values = [id, userId];
+                respuesta = await this.DBClient.query(query, values);
+                return [respuesta.rowCount, 200, null];
+                
+            }
+        }
 //IMPORTANTE:
 //SEGUN OSTRO VA A DAR ERROR PORQUE EL ID_CREATOR SE USA EN MUCHAS PARTES Y SI LO BOORAS CRASHEA POR EL METODO CASCADA O ALGO ASI
 //SEGUN SCHIFFER HAY QUE PROBARLO Y VER SI FUNCIONA. SI NO FUNCIONA PUEDE QUE NECESITE OTRO DELETE QUE BORRE "LA TABLA" DE LOS EVENTOS DE ENROLLMENT PORQUE NO PUEDE DAR NULL O ALGO ASI
-        const values = [id, userId];
-        return await this.DBClient.query(query, values);
+        
     }
     //PUNTO 9
     /*
@@ -245,23 +274,105 @@ async updateEvent(event, userId) {
     */
 
     async insertEnrollment(id_event, id_user){
-        const existe = await this.DBClient.query(("SELECT id FROM event_enrollments WHERE id_event = $1 AND id_user = $2"), [id_event, id_user]);
-        if(existe == null){
-            const sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
-            const values = [id_event, id_user];
-            return await this.DBClient.query(sql, values);
+        var sql = "SELECT * FROM event WHERE id = $1";
+        var values = [id_event];
+        const evento = await this.DBClient.query(sql, values);
+        if(evento == null){
+            return [404, null];
         }
-        return false;
+        else{
+            if(evento.rows[0].start_date <= new Date()){
+                return [400, "El evento ya ocurrió"];
+            }
+            else if(evento.rows[0].enabled_for_enrollment == false){
+                return [400, "El evento no está habilitado para inscripciones"];
+            }
+            else{
+                sql = "SELECT COUNT(id) FROM event_enrollments WHERE id_event = $1";
+                values = [id_event];
+                const cantidad = await this.DBClient.query(sql, values);
+                if(cantidad < evento.rows[0].max_assistance){
+                    sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
+                    values = [id_event, id_user];
+                    const insert = await this.DBClient.query(sql, values);
+                    return [200, null];
+                }
+                else{
+                    return [400, "El evento ya alcanzó su máxima capacidad"];
+                }
+            }
+        }
     }
 
-    async uploadUserStuff(id_event, id_user, description, attended, observations, rating){
-        const existe = await this.DBClient.query(("SELECT ee.id, e.start_date FROM event_enrollments ee INNER JOIN events e ON ee.id_event = e.id_event WHERE ee.id_event = $1 AND ee.id_user = $2"), values[id_event, id_user]);
-        const hoy = new Date();
-        if(existe != null && existe.start_date < hoy){
-            const sql = "UPDATE event_enrollments SET description = $1, attended = $2, observations = $3, rating = $4 WHERE id_event = $5 AND id_user = $6";
-            const values = [description, attended, observations, rating, id_event, id_user];
-            return await this.DBClient.query(sql,values);
+    async deleteEnrollment(id_event, id_user){  
+        var sql = "SELECT * FROM event ON id = $1";
+        var values = [id_event];
+        const evento = await this.DBClient.query(evento, values);
+        if(evento.rowCount == 0){
+            return [404, null];
         }
-        return false;
+        else{
+            sql = "SELECT id from event_enrollments WHERE id_event = $1 AND id_user = $2";
+            values = [id_event, id_user];
+            const existe = await this.DBClient.query(sql, values);
+            if(existe.rowCount == 0){
+                return [400, "Se intenta remover de un evento en el que no esta registrado"];
+            }
+            else{
+                if(evento.rows[0].start_date <= new Date()){
+                    return [400, "Intenta removerse de un evento que ya sucedió (start_date), o la fecha del evento es hoy."];
+                }
+                else{
+                    sql = "DELETE FROM event_enrollments WHERE id_event = $1 AND id_user = $2";
+                    const deleted = await this.DBClient.query(sql, values);
+                    if(deleted.rowCount > 0){
+                        return [200, null];
+                    }
+                    else{
+                        return [400, null];
+                    }
+                }
+            }
+        }
+
+    }
+
+    async uploadUserStuff(id_event, id_user, observations, rating){
+        var sql = "SELECT * FROM events WHERE id = $1";
+        var values = [id_event];
+        const evento = await this.DBClient.query(sql, values);
+        if(evento.rowCount == 0){
+            return [404, null];
+        }
+        else{
+            sql = "SELECT id FROM event_enrollments WHERE id_event = $1 AND id_user = $2";
+            values = [id_event, id_user];
+            const existe = await this.DBClient.query(sql, values);
+            if(existe.rowCount > 0){
+                if(evento.rows[0].start_date <= new Date()){
+                    if(rating >= 1 && rating <= 10){
+                        sql = "UPDATE event_enrollments SET rating = $1, observations = $2 WHERE id_event = $3 AND id_user = $4";
+                        values = [rating, observations, id_event, id_user];
+                        const enrollmentActualizado = await this.DBClient.query(sql, values);
+                        if(enrollmentActualizado.rowCount > 0){
+                            return [200, null];
+                        }
+                        else{
+                            return [400, null];
+                        }
+                    }
+                    else{
+                        return [400, "Los valores del rating (rating), no se encuentran entre 1 y 10 (inclusives)"];
+                    }
+                    
+                }
+                else{
+                    return [400, "El evento no ha finalizado aún, la fecha (start_date) tiene que ser mayor a hoy."];
+                }
+            }
+            else{
+                return [400, "El usuario no está inscripto en el evento"];
+            }
+        }
     }
 }

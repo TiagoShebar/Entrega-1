@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
         const allEventCategories = await eventCategoryService.getEvent_Category(limit, offset, nextPage);
         return res.status(200).send("ok"), json(allEventCategories);
     }catch { 
-        return res.status(500).send(error);
+        return res.status(400).send(error);
     }
     
 });
@@ -33,7 +33,7 @@ router.get("/:id", async (req, res) => {
         }
     }
     catch {
-        return res.status(500).send(error);
+        return res.status(400).send(error);
     }
 });
 
