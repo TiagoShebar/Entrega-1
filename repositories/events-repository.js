@@ -285,9 +285,10 @@ async updateEvent(event, userId) {
 
     async insertEnrollment(id_event, id_user){
         try{
-            var sql = "SELECT * FROM event WHERE id = $1";
+            var sql = "SELECT * FROM events WHERE id = $1";
             var values = [id_event];
-            const evento = await this.DBClient.query(sql, values);
+            const evento = await this.DBClient.query(sql, values);  
+            
             if(evento == null){
                 return [404, null];
             }
@@ -299,12 +300,13 @@ async updateEvent(event, userId) {
                     return [400, "El evento no está habilitado para inscripciones"];
                 }
                 else{
-                    sql = "SELECT COUNT(id) FROM event_enrollments WHERE id_event = $1";
+                    sql = "SELECT COUNT(id) AS cantidad FROM event_enrollments WHERE id_event = $1";
                     values = [id_event];
                     const cantidad = await this.DBClient.query(sql, values);
-                    if(cantidad < evento.rows[0].max_assistance){
+                    if(cantidad.rows[0].cantidad < evento.rows[0].max_assistance){
                         sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
                         values = [id_event, id_user];
+                        
                         const insert = await this.DBClient.query(sql, values);
                         return [200, null];
                     }
@@ -315,15 +317,15 @@ async updateEvent(event, userId) {
             }
         }
         catch(error){
-            return [400, error.detail];
+            return [400, error];
         }
         
     }
 
     async deleteEnrollment(id_event, id_user){  
-        var sql = "SELECT * FROM event ON id = $1";
+        var sql = "SELECT * FROM events WHERE id = $1";
         var values = [id_event];
-        const evento = await this.DBClient.query(evento, values);
+        const evento = await this.DBClient.query(sql, values);
         if(evento.rowCount == 0){
             return [404, null];
         }
