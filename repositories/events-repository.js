@@ -82,12 +82,20 @@ export class EventRepository {
     async getEvent(mensajeCondicion, limit, offset) {
         var queryBase = this.queryTraerEvento() + `
             ${mensajeCondicion}
+            ORDER BY e.id
             LIMIT $1
             OFFSET $2;
         `;
+
+        console.log(queryBase);
+        console.log('Limit:', limit);
+        console.log('Offset:', offset);
         const values = [limit, offset*limit];
+        console.log("aaaaaaa");
         const respuesta = await this.DBClient.query(queryBase, values);
 
+
+        console.log(respuesta.rows[0].id);
         queryBase = `SELECT COUNT(e.id) FROM events e 
         INNER JOIN 
             event_categories ec ON e.id_event_category = ec.id 
@@ -106,6 +114,7 @@ export class EventRepository {
         ${mensajeCondicion} GROUP BY e.id`;
 
         const totalCount = await this.DBClient.query(queryBase);
+    
 
         return [respuesta.rows,totalCount.rows.length];
     }

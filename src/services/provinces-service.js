@@ -69,6 +69,9 @@ export class ProvincesService{
         limit = Pagination.ParseLimit(limit);
         offset = Pagination.ParseOffset(offset);
         const [locations,totalCount] = await this.bd.getLocationsByProvince(limit, offset, id);
+        if(locations === null){
+            return null;
+        }
         return Pagination.BuildPagination(locations, limit, offset, url, totalCount);
     }
 }

@@ -12,7 +12,8 @@ router.get("/", AuthMiddleware, async (req, res) => {
         const allEventLocations = await eventLocationService.getAllEventLocations(userId);
         return res.status(200).json(allEventLocations);
     } catch (error) {
-        return res.status(400).send(error);
+        console.log(error);
+        return res.status(400).send();
     }
 });
 
@@ -26,7 +27,8 @@ router.get("/:id", AuthMiddleware, async (req, res) => {
             return res.status(404).send("Not found");
         }
     } catch (error) {
-        return res.status(400).send(error);
+        console.log(error);
+        return res.status(400).send();
     }
 });
 
@@ -37,7 +39,8 @@ router.post("/", AuthMiddleware, async (req, res) => {
         const createdEventLocation = await eventLocationService.createEventLocation(eventLocation);
         return res.status(201).json(createdEventLocation);
     } catch (error) {
-        return res.status(400).send(error.message);
+        console.log(error);
+        return res.status(400).send();
     }
 });
 
@@ -48,7 +51,8 @@ router.put("/", AuthMiddleware, async (req, res) => {
         const updatedEventLocation = await eventLocationService.updateEventLocation(eventLocation);
         return res.status(200).json(updatedEventLocation);
     } catch (error) {
-        return res.status(400).send(error.message);
+        console.log(error);
+        return res.status(400).send();
     }
 });
 
@@ -62,7 +66,8 @@ router.delete("/:id", AuthMiddleware, async (req, res) => {
             return res.status(404).send("Not found");
         }
     } catch (error) {
-        return res.status(500).send(error);
+        console.log(error);
+        return res.status(400).send();
     }
 });
 

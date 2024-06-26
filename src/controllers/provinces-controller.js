@@ -106,7 +106,7 @@ router.get("/:id/locations", async (req, res) => {
     const offset = req.query.offset;
     try {
         const locations = await provinceService.getLocationsByProvinceId(limit, offset, req.originalUrl, req.params.id);
-        if(locations){
+        if(locations !== null){
             return res.status(200).json(locations);
         }else{
             return res.status(404).send();

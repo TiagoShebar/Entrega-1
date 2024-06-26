@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
     try{
         const allLocations = await locationService.getAllLocations(offset, limit, req.originalUrl);
         return res.status(200).json(allLocations);
-    }catch { 
+    }catch (error) { 
         return res.status(400).send(error);
     }
     
@@ -28,7 +28,7 @@ router.get("/:id", async (req, res) => {
             return res.status(404).send();
         }
     }
-    catch {
+    catch (error) {
         return res.status(400).send(error);
     }
     
@@ -47,7 +47,7 @@ router.get("/:id/event_location", AuthMiddleware, async (req, res) => {
             return res.status(404).send();
         }
     }
-    catch {
+    catch (error) {
         return res.status(400).send(error);
     }
     

@@ -87,8 +87,17 @@ export class ProvinceRepository {
     }
 
     async getLocationsByProvince(limit,offset,id) {
-        var sql = "SELECT id, name, id_province, latitude, longitude FROM locations WHERE id_province = $1 LIMIT $2 OFFSET $3";
-        var values = [id, limit, offset*limit];
+        var sql = "SELECT id FROM provinces WHERE id = $1";
+        var values = [id];
+        const existe = await this.DBClient.query(sql, values);
+
+        if(existe.rows.length === 0){
+            return [null, 0];
+        }
+        
+        
+        sql = "SELECT id, name, id_province, latitude, longitude FROM locations WHERE id_province = $1 LIMIT $2 OFFSET $3";
+        values = [id, limit, offset*limit];
         const respuesta = await this.DBClient.query(sql, values);
         sql = `SELECT COUNT(id) FROM locations WHERE id_province = $1 GROUP BY id`;
         values=[id];
