@@ -1,6 +1,6 @@
 import express from "express";
 import {EventsService} from "../services/events-service.js";
-import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { AuthMiddleware } from "../auth/AuthMiddleware.js";
 import { verificarObjeto } from "../utils/objetoVerificacion.js";
 import { Event } from "../entities/event.js";
 
@@ -203,7 +203,7 @@ router.patch("/:id/enrollment/:rating", AuthMiddleware, async (req, res) => {
     const rating = req.query.rating;
     const userId = req.user.id;
 
-    const [statusCode, mensaje] = await eventService.uploadUserStuff(id_event, id_user, observations, rating);
+    const [statusCode, mensaje] = await eventService.uploadUserStuff(id_event, userId, observations, rating);
     return res.status(statusCode).send(mensaje);
 
 });

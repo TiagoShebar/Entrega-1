@@ -9,6 +9,7 @@ export class LocationService {
 
     async getAllLocations(offset, limit, url){
         limit = Pagination.ParseLimit(limit);
+        console.log(limit);
         offset = Pagination.ParseOffset(offset);
         const [locations,totalCount] = await this.bd.getAllLocations(limit, offset);
         return Pagination.BuildPagination(locations, limit, offset, url, totalCount);

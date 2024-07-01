@@ -10,7 +10,7 @@ export class LocationRepository {
 
     async getAllLocations(limit, offset) {
         var query = "SELECT * FROM locations LIMIT $1 OFFSET $2";
-        const values = [limit, offset];
+        const values = [limit, offset*limit];
         const result = await this.DBClient.query(query, values);
         query = `SELECT COUNT(id) AS total FROM locations`;
         const totalCount = await this.DBClient.query(query);
@@ -29,7 +29,7 @@ export class LocationRepository {
         const result = await this.DBClient.query(query, values);
         if(result.rowCount > 0){
             query = "SELECT * FROM event_locations WHERE location_id = $1 LIMIT $2 OFFSET $3";
-            values = [id, limit, offset];
+            values = [id, limit, offset*limit];
             const result = await this.DBClient.query(query, values);
             query = `SELECT COUNT(id) FROM event_locations WHERE location_id = $1 GROUP BY id`;
             const totalCount = await this.DBClient.query(query, values);

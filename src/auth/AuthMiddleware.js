@@ -8,15 +8,22 @@ export function AuthMiddleware(req, res, next){
         const token = req.headers.authorization.split(' ')[1];
         console.log('Token recibido:', token); // Verifica si el token se está recibiendo correctamente
 
-        const decryptedToken = decryptToken(token);
-        console.log('Token decodificado:', decryptedToken); // Verifica el objeto decodificado
+        try {
+            const decryptedToken = decryptToken(token);
+            console.log('Token decodificado:', decryptedToken); // Verifica el objeto decodificado
 
-        if (!decryptedToken) {
-            return res.status(401).send("Token inválido");
+            if (!decryptedToken) {
+                return res.status(401).send("Token inválido");
+            }
+
+            req.user = decryptedToken;
+            next();
+        } catch (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).send("Token ha expirado, por favor inicie sesión nuevamente.");
+            } else {
+                return res.status(500).send("Error interno del servidor");
+            }
         }
-
-        req.user = decryptedToken;
     }
-
-    next();
 }

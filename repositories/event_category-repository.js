@@ -10,7 +10,7 @@ export class EventCategoryRepository {
 
     async getAllEvent_Category(limit, offset) {
         var query = `SELECT * FROM event_categories LIMIT $1 OFFSET $2`;
-        const result = await this.DBClient.query(query, [limit, offset]);
+        const result = await this.DBClient.query(query, [limit, offset*limit]);
         query = `SELECT COUNT(id) FROM event_categories`;   
         const totalCount = await this.DBClient.query(query);
         return [result.rows, totalCount.rows.length];
