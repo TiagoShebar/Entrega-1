@@ -1,13 +1,23 @@
 import express from "express";
 import {LocationService} from "../services/location-service.js";
-import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { AuthMiddleware } from "../auth/AuthMiddleware.js";
+import { Pagination } from "../entities/pagination.js"
 
 const router = express.Router();
 const locationService = new LocationService();
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    let limit = req.query.limit;
+    const page = req.query.page;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
 
     try{
         const allLocations = await locationService.getAllLocations(offset, limit, req.originalUrl);
@@ -35,8 +45,17 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/event_location", AuthMiddleware, async (req, res) => {
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    let limit = req.query.limit;
+    const page = req.query.page;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
 
     try {
         const event_locations = await locationService.getEventLocationsByIdLocation(limit, offset, req.originalUrl, req.params.id);

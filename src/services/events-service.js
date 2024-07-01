@@ -46,8 +46,6 @@ export class EventsService {
             }
         }
         
-        limit = Pagination.ParseLimit(limit);
-        offset = Pagination.ParseOffset(offset);
         const [eventos,totalCount] = await this.bd.getEvent(mensajeCondicion, limit, offset);
         return Pagination.BuildPagination(eventos, limit, offset, url, totalCount);
     }
@@ -82,8 +80,6 @@ export class EventsService {
             mensajeCondicion += ` AND ee.rating = ${rating}`;
         }
 
-        limit = Pagination.ParseLimit(limit);
-        offset = Pagination.ParseOffset(offset);
         const [participants,totalCount] = await this.bd.getParticipantEvent(id, mensajeCondicion, limit, offset);
         
         return Pagination.BuildPagination(participants, limit, offset, url, totalCount);
@@ -207,7 +203,7 @@ async updateEnrollment(id_event, enrollment_id, id_user, rating, observations) {
     }
 
     async uploadUserStuff(id_event, id_user, observations, rating){
-        const [statusCode, mensaje] = this.bd.uploadUserStuff(id, id_user, observations, rating);
+        const [statusCode, mensaje] = await this.bd.uploadUserStuff(id_event, id_user, observations, rating);
         return [statusCode, mensaje];
     }
     //PUNTO 9

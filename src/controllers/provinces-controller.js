@@ -1,8 +1,9 @@
 import express from "express";
 import {ProvincesService} from "../services/provinces-service.js";
 import { Province } from "../entities/province.js";
-import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { AuthMiddleware } from "../auth/AuthMiddleware.js";
 import { verificarObjeto } from "../utils/objetoVerificacion.js";
+import { Pagination } from "../entities/pagination.js"
 
 const router = express.Router();
 const provinceService = new ProvincesService();
@@ -75,8 +76,17 @@ router.delete( "/:id", AuthMiddleware, async (req,res) =>{
 });
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    let limit = req.query.limit;
+    const page = req.query.page;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
 
     try{
         const provinces = await provinceService.getAllProvinces(limit, offset, req.originalUrl);
@@ -102,8 +112,18 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/locations", async (req, res) => {
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    let limit = req.query.limit;
+    const page = req.query.page;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
+
     try {
         const locations = await provinceService.getLocationsByProvinceId(limit, offset, req.originalUrl, req.params.id);
         if(locations !== null){

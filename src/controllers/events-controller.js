@@ -3,17 +3,27 @@ import {EventsService} from "../services/events-service.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
 import { verificarObjeto } from "../utils/objetoVerificacion.js";
 import { Event } from "../entities/event.js";
+import { Pagination } from "../entities/pagination.js"
 
 const router = express.Router();
 const eventService = new EventsService();
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    let limit = req.query.limit;
+    const page = req.query.page;
     const tag = req.query.tag;
     const start_date = req.query.startdate;
     const name = req.query.name;
     const category = req.query.category;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
 
 
     try{
@@ -49,13 +59,23 @@ router.get("/:id", async (req, res) => {
 });
 
 router.get("/:id/enrollment", async (req, res) => {
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    let limit = req.query.limit;
+    const page = req.query.page;
     const first_name = req.query.first_name;
     const last_name = req.query.last_name;
     const username = req.query.username;
     const attended = req.query.attended;
     const rating = req.query.rating;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
+
     try {
         const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating, limit, offset, req.originalUrl);
         console.log(participants);
@@ -200,7 +220,7 @@ router.delete("/:id/enrollment", AuthMiddleware, async(req, res) => {
 router.patch("/:id/enrollment/:rating", AuthMiddleware, async (req, res) => {
     const id_event =req.params.id;
     const observations = req.body.observations;
-    const rating = req.query.rating;
+    const rating = req.params.rating;
     const userId = req.user.id;
 
     const [statusCode, mensaje] = await eventService.uploadUserStuff(id_event, userId, observations, rating);

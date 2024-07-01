@@ -1,15 +1,28 @@
 //PUNTO 13, fijarse si funciona y si se ejcuta en algun momento
 import express from "express";
 import { EventLocationService } from "../services/event_location-service.js";
-import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { AuthMiddleware } from "../auth/AuthMiddleware.js";
+import { Pagination } from "../entities/pagination.js"
 
 const router = express.Router();
 const eventLocationService = new EventLocationService();
 
 router.get("/", AuthMiddleware, async (req, res) => {
     const userId = req.user.id;
+    let limit = req.query.limit;
+    const page = req.query.page;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
+
     try {
-        const allEventLocations = await eventLocationService.getAllEventLocations(userId);
+        const allEventLocations = await eventLocationService.getAllEventLocations(userId, limit, offset, req.originalUrl);
         return res.status(200).json(allEventLocations);
     } catch (error) {
         console.log(error);

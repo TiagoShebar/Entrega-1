@@ -1,18 +1,28 @@
 import express from "express";
 import {EventCategoryService} from "../services/event_category-service.js";
 import { EventCategory } from "../entities/event_category.js";
-import { AuthMiddleware } from "../auth/authMiddleware.js";
+import { AuthMiddleware } from "../auth/AuthMiddleware.js";
 import { verificarObjeto } from "../utils/objetoVerificacion.js";
+import { Pagination } from "../entities/pagination.js"
 
 const router = express.Router();
 const eventCategoryService = new EventCategoryService();
 
 router.get("/", async (req, res) => {
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    let limit = req.query.limit;
+    const page = req.query.page;
+
+    limit = Pagination.ParseLimit(limit);
+    if(limit === false){
+        return res.status(400).send();
+    }
+    const offset = Pagination.ParseOffset(page);
+    if(offset === false){
+        return res.status(400).send();
+    }
 
     try{
-        const allEventCategories = await eventCategoryService.getEvent_Category(limit, offset, req.originalUrl);
+        const allEventCategories = await eventCategoryService.getAllEvent_Category(limit, offset, req.originalUrl);
         return res.status(200).json(allEventCategories);
     }catch (e){ 
         return res.status(400).send(e);
@@ -24,13 +34,10 @@ router.get("/:id", async (req, res) => {
     try {
         const event_category = await eventCategoryService.getEvent_CategoryById(req.params.id);
         if(!event_category){
-            return res.status(400).send(mensaje);
-        }
-        else if(event_category == null){
-            return res.status(200).json(event_category);
+            return res.status(404).send();
         }
         else{
-            return res.status(404).send();
+            return res.status(200).json(event_category);
         }
     }
     catch {

@@ -68,10 +68,10 @@ export class ProvinceRepository {
         const respuesta = await this.DBClient.query(sql, values);
 
     
-        sql = `SELECT COUNT(id) FROM provinces GROUP BY id`;
+        sql = `SELECT COUNT(id) AS total FROM provinces`;
         const totalCount = await this.DBClient.query(sql);
 
-        return [respuesta.rows,totalCount.rows.length];
+        return [respuesta.rows,totalCount.rows[0].total];
     }   
 
     async getProvinceById(id) {
@@ -99,11 +99,11 @@ export class ProvinceRepository {
         sql = "SELECT id, name, id_province, latitude, longitude FROM locations WHERE id_province = $1 LIMIT $2 OFFSET $3";
         values = [id, limit, offset*limit];
         const respuesta = await this.DBClient.query(sql, values);
-        sql = `SELECT COUNT(id) FROM locations WHERE id_province = $1 GROUP BY id`;
+        sql = `SELECT COUNT(id) AS total FROM locations WHERE id_province = $1`;
         values=[id];
         const totalCount = await this.DBClient.query(sql, values);
 
-        return [respuesta.rows,totalCount.rows.length];
+        return [respuesta.rows,totalCount.rows[0].total];
 
         //falta paginacion
     }

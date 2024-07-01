@@ -1,13 +1,15 @@
 //PUNTO 13, fijarse si funciona y si se ejcuta en algun momento
 import { EventLocationRepository } from "../../repositories/event_location-repository.js";
+import { Pagination } from "../entities/pagination.js"
 
 export class EventLocationService {
     constructor() {
         this.eventLocationRepository = new EventLocationRepository();
     }
 
-    async getAllEventLocations(userId) {
-        return await this.eventLocationRepository.getAllEventLocations(userId);
+    async getAllEventLocations(userId, limit, offset, url) {
+        const [eventLocations,totalCount] = await this.eventLocationRepository.getAllEventLocations(userId, limit, offset);
+        return Pagination.BuildPagination(eventLocations, limit, offset, url, totalCount);
     }
 
     async getEventLocationById(id, userId) {

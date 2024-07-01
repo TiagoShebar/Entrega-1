@@ -5,7 +5,7 @@ export class Pagination {
             collection: collection,
             pagination: {
                 limit: limit, 
-                offset: offset,
+                page: offset+1,
                 nextPage: (parseInt(offset) + 1)*limit < total ? this.BuildNextPage(limit, offset, url) : null,
                 total: total
             }
@@ -25,23 +25,23 @@ export class Pagination {
 
             // Verificar si la URL original ya tiene parámetros
             if (url.includes("?")) {
-                nextPageUrl = `${process.env.BASE_URL}${url}&limit=${limit}&offset=${parseInt(offset) + 1}`;
+                nextPageUrl = `${process.env.BASE_URL}${url}&limit=${limit}&page=${parseInt(offset) + 2}`;
             } else {
-                nextPageUrl = `${process.env.BASE_URL}${url}?limit=${limit}&offset=${parseInt(offset) + 1}`;
+                nextPageUrl = `${process.env.BASE_URL}${url}?limit=${limit}&page=${parseInt(offset) + 2}`;
             }
 
             // Reemplazar el offset existente en la URL si es necesario
-            if (url.includes("offset=")) {
-                nextPageUrl = `${process.env.BASE_URL}${url.replace(/(offset=)\d+/, 'offset=' + (parseInt(offset) + 1))}`;
+            if (url.includes("page=")) {
+                nextPageUrl = `${process.env.BASE_URL}${url.replace(/(page=)\d+/, 'page=' + (parseInt(offset) + 2))}`;
                 if (!url.includes("limit=")) {
-                    nextPageUrl = nextPageUrl.replace(/(offset=)\d+/, 'limit=' + limit + '&$1' + (parseInt(offset) + 1));
+                    nextPageUrl = nextPageUrl.replace(/(page=)\d+/, 'limit=' + limit + '&$1' + (parseInt(offset) + 2));
                 }
             } else{
                 if (url.includes("limit=")) {
-                    nextPageUrl = `${process.env.BASE_URL}${url}&offset=${parseInt(offset) + 1}`;
+                    nextPageUrl = `${process.env.BASE_URL}${url}&page=${parseInt(offset) + 2}`;
                 }
                 else{
-                    nextPageUrl = `${process.env.BASE_URL}${url}?limit=${limit}&offset=${parseInt(offset) + 1}`;
+                    nextPageUrl = `${process.env.BASE_URL}${url}?limit=${limit}&page=${parseInt(offset) + 2}`;
                 }
             } 
 
@@ -52,11 +52,26 @@ export class Pagination {
     }
 
     static ParseLimit(limit) {
-        return !isNaN(limit) && limit > 0 ? limit : 10;
+        if(limit === undefined){
+            return 10;
+        }
+        else if(isNaN(limit) || limit <= 0){
+            return false;
+        }
+        else{
+            return limit;
+        }
     }
 
-    static ParseOffset(offset) {
-        return !isNaN(offset) ? offset : 0;
+    static ParseOffset(page) {  
+        if(page === undefined){
+           return 0; 
+        }
+        else if(isNaN(page) || page <= 0){ 
+            return false;
+        }else{
+            return page-1;
+        }
     }
 
     

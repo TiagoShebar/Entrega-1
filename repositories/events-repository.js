@@ -63,7 +63,7 @@ export class EventRepository {
             events e 
         INNER JOIN 
             event_categories ec ON e.id_event_category = ec.id 
-        LEFT JOIN 
+        INNER JOIN 
             event_locations el ON e.id_event_location = el.id
         INNER JOIN
             locations l ON el.id_location = l.id
@@ -82,21 +82,14 @@ export class EventRepository {
     async getEvent(mensajeCondicion, limit, offset) {
         var queryBase = this.queryTraerEvento() + `
             ${mensajeCondicion}
-            ORDER BY e.id
             LIMIT $1
             OFFSET $2;
         `;
 
-        console.log(queryBase);
-        console.log('Limit:', limit);
-        console.log('Offset:', offset);
         const values = [limit, offset*limit];
-        console.log("aaaaaaa");
         const respuesta = await this.DBClient.query(queryBase, values);
 
-
-        console.log(respuesta.rows[0].id);
-        queryBase = `SELECT COUNT(e.id) FROM events e 
+        queryBase = `SELECT COUNT(e.id) AS total FROM events e 
         INNER JOIN 
             event_categories ec ON e.id_event_category = ec.id 
         LEFT JOIN 
@@ -111,12 +104,12 @@ export class EventRepository {
             event_tags et on et.id_event = e.id
         INNER JOIN
             tags t on et.id_tag = t.id
-        ${mensajeCondicion} GROUP BY e.id`;
+        ${mensajeCondicion}`;
 
         const totalCount = await this.DBClient.query(queryBase);
     
 
-        return [respuesta.rows,totalCount.rows.length];
+        return [respuesta.rows,totalCount.rows[0].total];
     }
 
     async getEventById(id) {
@@ -150,11 +143,11 @@ export class EventRepository {
         var values = [id, limit, offset*limit];
 
         const respuesta = await this.DBClient.query(query, values);
-        query = `SELECT COUNT(ee.id) FROM event_enrollments ee INNER JOIN users u ON ee.id_user = u.id WHERE id_event = $1 ${mensajeCondicion} GROUP BY ee.id`;
+        query = `SELECT COUNT(ee.id) AS total FROM event_enrollments ee INNER JOIN users u ON ee.id_user = u.id WHERE id_event = $1 ${mensajeCondicion}`;
         values=[id];   
 
         const totalCount = await this.DBClient.query(query,values);
-        return [respuesta.rows,totalCount.rows.length];
+        return [respuesta.rows,totalCount.rows[0].total];
     }
 
     async createEvent(event){
@@ -297,8 +290,7 @@ async updateEvent(event, userId) {
             var sql = "SELECT * FROM events WHERE id = $1";
             var values = [id_event];
             const evento = await this.DBClient.query(sql, values);  
-            
-            if(evento == null){
+            if(evento.rowCount === 0){
                 return [404, null];
             }
             else{
@@ -326,6 +318,7 @@ async updateEvent(event, userId) {
             }
         }
         catch(error){
+            console.log(error);
             return [400, error];
         }
         

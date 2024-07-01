@@ -8,8 +8,6 @@ export class EventCategoryService {
     }
 
     async getAllEvent_Category(limit, offset, url){
-        limit = Pagination.ParseLimit(limit);
-        offset = Pagination.ParseOffset(offset);
         const [event_categories,totalCount] = await this.bd.getAllEvent_Category(limit, offset);
         return Pagination.BuildPagination(event_categories, limit, offset, url, totalCount);
     }
