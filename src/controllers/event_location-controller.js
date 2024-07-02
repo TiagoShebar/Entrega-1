@@ -3,6 +3,7 @@ import express from "express";
 import { EventLocationService } from "../services/event_location-service.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
 import { Pagination } from "../entities/pagination.js"
+import { EventLocation } from "../entities/event_location.js";
 
 const router = express.Router();
 const eventLocationService = new EventLocationService();
@@ -46,26 +47,57 @@ router.get("/:id", AuthMiddleware, async (req, res) => {
 });
 
 router.post("/", AuthMiddleware, async (req, res) => {
-    const eventLocation = req.body;
-    eventLocation.id_creator_user = req.user.id;
+    const eventLocation = new EventLocation(
+        null,
+        req.body.id_location,
+        req.body.name,
+        req.body.full_address,
+        req.body.max_capacity,
+        req.body.latitude,
+        req.body.longitude,
+        req.user.id
+    );
+
     try {
-        const createdEventLocation = await eventLocationService.createEventLocation(eventLocation);
-        return res.status(201).json(createdEventLocation);
+        const created = await eventLocationService.createEventLocation(eventLocation);
+        if(created === true){
+            return res.status(201).send();
+        }
+        else if(created === false){
+            return res.status(400).send("El id_location es inexistente");
+        }
+        else{
+            return res.status(400).send(created);
+        }
     } catch (error) {
         console.log(error);
-        return res.status(400).send();
+        return res.status(400).send(error);
     }
 });
 
 router.put("/", AuthMiddleware, async (req, res) => {
-    const eventLocation = req.body;
-    eventLocation.id_creator_user = req.user.id;
+    const eventLocation = new EventLocation(
+        req.body.id,
+        req.body.id_location,
+        req.body.name,
+        req.body.full_address,
+        req.body.max_capacity,
+        req.body.latitude,
+        req.body.longitude,
+        req.user.id
+    );
+
+    if(eventLocation.id === undefined){
+        return res.status(400).send();
+    }
+
     try {
-        const updatedEventLocation = await eventLocationService.updateEventLocation(eventLocation);
-        return res.status(200).json(updatedEventLocation);
+        const [statusCode, message] = await eventLocationService.updateEventLocation(eventLocation);
+        if(message)
+        
     } catch (error) {
         console.log(error);
-        return res.status(400).send();
+        return res.status(400).send(error);
     }
 });
 

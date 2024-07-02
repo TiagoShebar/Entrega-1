@@ -1,6 +1,7 @@
 import { query } from "express";
 import { EventCategoryRepository } from "../../repositories/event_category-repository.js";
 import { Pagination } from "../entities/pagination.js"
+import { verifyLength } from "../utils/objetoVerificacion.js";
 
 export class EventCategoryService {
     constructor() {
@@ -18,7 +19,7 @@ export class EventCategoryService {
     }
 
     async createEventCategory(event_category){
-        if(this.verificarLength(event_category.name)){
+        if(!verifyLength(event_category.name)){
             return false;
         }
         else{
@@ -27,16 +28,14 @@ export class EventCategoryService {
         }
     }
 
-    verificarLength(name){
-        return name.length >= 3;
-    }
-
-    async updateEventCategory(id){
-
+    async updateEventCategory(event_category){
+        const result = await this.bd.updateEventCategory(event_category);
+        return result;
     }
 
     async deleteEventCategory(id){
-
+        const deleted = await this.bd.deleteEventCategory(id);
+        return deleted;
     }
     //PUNTO 12
 /*

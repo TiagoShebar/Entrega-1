@@ -28,6 +28,18 @@ export class EventCategoryRepository {
         const result = await this.DBClient.query(query, values);
         return result.rowCount;
     }
+
+    async updateEventCategory(event_category){
+        const query = "INSERT INTO event_categories (name, display_order) VALUES ($2, $3) WHERE id = $1";
+        const result = await this.DBClient.query(query, [event_category.id, event_category.name, event_category.display_order]);
+        return result.rowCount > 0;
+    }
+
+    async deleteEventCategory(id){
+        const query = "DELETE FROM event_categories WHERE id = $1";
+        const deleted = await this.DBClient.query(query, [id]);
+        return deleted.rowCount > 0;
+    }
 }
 // PUNTO 12
 /*

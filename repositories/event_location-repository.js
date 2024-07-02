@@ -26,10 +26,9 @@ export class EventLocationRepository {
     }
 
     async createEventLocation(eventLocation) {
-        const { name, full_address, id_location, max_capacity, id_creator_user } = eventLocation;
-        const query = `INSERT INTO event_locations (name, full_address, id_location, max_capacity, id_creator_user) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-        const result = await this.DBClient.query(query, [name, full_address, id_location, max_capacity, id_creator_user]);
-        return result.rows[0];
+        const query = `INSERT INTO event_locations (id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+        const result = await this.DBClient.query(query, [eventLocation.id_location, eventLocation.name, eventLocation.full_address, eventLocation.max_capacity, eventLocation.latitude, eventLocation.longitude, eventLocation.id_creator_user]);
+        return result.rowsCount > 0;
     }
 
     async updateEventLocation(eventLocation) {

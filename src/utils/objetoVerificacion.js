@@ -6,3 +6,7 @@ export const verificarObjeto = (obj) => {
     }
     return true;
 }
+
+export const verifyLength = (string) => {
+    return string.length >= 3;
+}

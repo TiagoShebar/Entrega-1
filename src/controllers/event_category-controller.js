@@ -45,27 +45,68 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-router.post("/", AuthMiddleware, async (req, res) => {
-    const event_category = new EventCategory();
-    event_category = {
-        name: req.body.name,
-        display_order: req.body.display_order
-    }
+router.post("/", async (req, res) => {
+    const event_category = new EventCategory(
+        null,
+        req.body.name,
+        req.body.display_order
+    );
 
     /*if(verificarObjeto(event_category)){
 
     }*/
     try {
-        const event_categoryCreado = await EventCategoryService.createEventCategory(event_category);
-        return res.status(201);
+        const event_categoryCreado = await eventCategoryService.createEventCategory(event_category);
+        if(event_categoryCreado === false){
+            return res.status(400).send("El nombre (name) está vacío o tiene menos de tres (3) letras");
+        }
+        else{
+            return res.status(201).send();
+        }
+        
     }
     catch {
         return res.status(400).send(error);
     }
 });
 
-router.delete("/:id", AuthMiddleware, async (req, res) => {
+router.put("/", async (req, res) => {
+    const event_category = new EventCategory(
+        req.body.id,
+        req.body.name,
+        req.body.display_order
+    );
 
+    if(event_category.id === undefined){
+        return res.status(400).send("id no puesto");
+    }
+
+    try {
+        const result = await eventCategoryService.updateEventCategory(event_category);
+        if(result === false){
+            return res.status(404).send();
+        }
+        return res.status(200).send();
+    }
+    catch(error){
+        return res.status(400).send(error);
+    }
+    
+});
+
+router.delete("/:id", AuthMiddleware, async (req, res) => {
+    const id = req.params.id;
+
+    try{
+        const deleted = await eventCategoryService.deleteEventCategory(id);
+        if(!deleted){
+            return res.status(404).send();
+        }
+        return res.status(200).send();
+    }
+    catch(error){
+        return res.status(400).send(error);
+    }
 });
 
 export default router;
