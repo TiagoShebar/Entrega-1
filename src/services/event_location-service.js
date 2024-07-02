@@ -19,7 +19,7 @@ export class EventLocationService {
 
     async createEventLocation(eventLocation) {
         // Implementa las validaciones necesarias antes de crear la ubicación del evento
-        const creation = this.verifyEventLocation(eventLocation);
+        let creation = this.verifyEventLocation(eventLocation);
         if(creation === true){
             creation = await this.eventLocationRepository.createEventLocation(eventLocation);
         }
@@ -31,7 +31,7 @@ export class EventLocationService {
         if(!verifyLength(eventLocation.name) || !verifyLength(eventLocation.full_address)){
             return "El nombre  (name) o la dirección (full_address) están vacíos o tienen menos de tres (3) letras";
         }
-        else if(eventLocation.max_capacity >= 0){
+        else if(eventLocation.max_capacity <= 0){
             return "El max_capacity es el número 0 (cero) o negativo";
         }
         else{
@@ -40,15 +40,17 @@ export class EventLocationService {
     }
 
     async updateEventLocation(eventLocation) {
-        const message = this.verifyEventLocation(eventLocation);
+        let message = this.verifyEventLocation(eventLocation);
+        let statusCode;
         if(message === true){
-            const update = await this.eventLocationRepository.updateEventLocation(eventLocation);
-
+            [statusCode, message] = await this.eventLocationRepository.updateEventLocation(eventLocation);
+            return [statusCode, message];
         }
-        return ;
+        return [400, message];
     }
 
     async deleteEventLocation(id, userId) {
-        return await this.eventLocationRepository.deleteEventLocation(id, userId);
+        const deleted = await this.eventLocationRepository.deleteEventLocation(id, userId);
+        return deleted;
     }
 }

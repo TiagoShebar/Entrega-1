@@ -26,21 +26,44 @@ export class EventLocationRepository {
     }
 
     async createEventLocation(eventLocation) {
-        const query = `INSERT INTO event_locations (id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-        const result = await this.DBClient.query(query, [eventLocation.id_location, eventLocation.name, eventLocation.full_address, eventLocation.max_capacity, eventLocation.latitude, eventLocation.longitude, eventLocation.id_creator_user]);
-        return result.rowsCount > 0;
+        let query = "SELECT * FROM locations WHERE id = $1";
+        const existeLocation = await this.DBClient.query(query, [eventLocation.id_location]);
+        if(existeLocation.rowCount > 0){
+            query = `INSERT INTO event_locations (id_location, name, full_address, max_capacity, latitude, longitude, id_creator_user) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+            const result = await this.DBClient.query(query, [eventLocation.id_location, eventLocation.name, eventLocation.full_address, eventLocation.max_capacity, eventLocation.latitude, eventLocation.longitude, eventLocation.id_creator_user]);
+            return (result.rowCount > 0);
+        }
+        else{
+            return false;
+        }
+        
     }
 
     async updateEventLocation(eventLocation) {
-        const { id, name, full_address, id_location, max_capacity, id_creator_user } = eventLocation;
-        const query = `UPDATE event_locations SET name = $1, full_address = $2, id_location = $3, max_capacity = $4 WHERE id = $5 AND id_creator_user = $6 RETURNING *`;
-        const result = await this.DBClient.query(query, [name, full_address, id_location, max_capacity, id, id_creator_user]);
-        return result.rows[0];
+        let query = "SELECT * FROM locations WHERE id = $1";
+        const existeLocation = await this.DBClient.query(query, [eventLocation.id_location]);
+        if(existeLocation.rowCount > 0){
+            query = "SELECT * FROM event_locations WHERE id=$1 AND id_creator_user=$2";
+            const existeEventLocation = await this.DBClient.query(query, [eventLocation.id, eventLocation.id_creator_user]);
+            if(existeEventLocation.rowCount > 0){
+                query = `UPDATE event_locations SET id_location = $1, name = $2, full_address = $3, max_capacity = $4, latitude = $5, longitude = $6 WHERE id = $7 AND id_creator_user = $8`;
+                const result = await this.DBClient.query(query, [eventLocation.id_location, eventLocation.name, eventLocation.full_address, eventLocation.max_capacity, eventLocation.latitude, eventLocation.longitude, eventLocation.id, eventLocation.id_creator_user]);
+                return [200, null];
+            }
+            else{
+                return [404, "el id del event_location es inexistente o no pertenece al usuario autenticado."];
+            }
+        }
+        else{
+            return [400, "El id_location es inexistente"];
+        }
+        
+        
     }
 
     async deleteEventLocation(id, userId) {
-        const query = `DELETE FROM event_locations WHERE id = $1 AND id_creator_user = $2 RETURNING *`;
+        const query = `DELETE FROM event_locations WHERE id = $1 AND id_creator_user = $2`;
         const result = await this.DBClient.query(query, [id, userId]);
-        return result.rows[0];
+        return result.rowCount > 0;
     }
 }

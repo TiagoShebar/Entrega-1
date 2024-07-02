@@ -150,7 +150,7 @@ router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     
     if(eventoEliminado > 0){
 
-        return res.status(200).json(eventoEliminado);
+        return res.status(200).send();
     }
     else{
         return res.status(statusCode).send(mensaje);

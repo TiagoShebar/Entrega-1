@@ -34,13 +34,13 @@ router.post("/login", async (req,res)=>{
 });
 
 router.post("/register", async (req,res)=>{
-    var user = new User();
-    user = {
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        username: req.body.username,
-        password: req.body.password
-    }
+    const user = new User(
+        null,
+        req.body.first_name,
+        req.body.last_name,
+        req.body.username,
+        req.body.password
+    );
 
     if(!verificarObjeto(user)){
         return res.status(400).send();
@@ -55,7 +55,7 @@ router.post("/register", async (req,res)=>{
         }
         else{
             const respuesta = await userService.ValidarRegistro(user);
-            if(respuesta){
+            if(respuesta === true){
                 return res.status(201).send();
             }
             else{

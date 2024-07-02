@@ -40,7 +40,7 @@ router.get("/:id", async (req, res) => {
             return res.status(200).json(event_category);
         }
     }
-    catch {
+    catch (error){
         return res.status(400).send(error);
     }
 });
@@ -65,7 +65,8 @@ router.post("/", async (req, res) => {
         }
         
     }
-    catch {
+    catch (error){
+        console.log(error);
         return res.status(400).send(error);
     }
 });

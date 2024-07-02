@@ -38,7 +38,7 @@ router.get("/:id", AuthMiddleware, async (req, res) => {
         if (eventLocation) {
             return res.status(200).json(eventLocation);
         } else {
-            return res.status(404).send("Not found");
+            return res.status(404).send();
         }
     } catch (error) {
         console.log(error);
@@ -88,12 +88,12 @@ router.put("/", AuthMiddleware, async (req, res) => {
     );
 
     if(eventLocation.id === undefined){
-        return res.status(400).send();
+        return res.status(400).send("id no puesto");
     }
 
     try {
         const [statusCode, message] = await eventLocationService.updateEventLocation(eventLocation);
-        if(message)
+        return res.status(statusCode).send(message);
         
     } catch (error) {
         console.log(error);
@@ -105,10 +105,10 @@ router.delete("/:id", AuthMiddleware, async (req, res) => {
     const userId = req.user.id;
     try {
         const deletedEventLocation = await eventLocationService.deleteEventLocation(req.params.id, userId);
-        if (deletedEventLocation) {
-            return res.status(200).json(deletedEventLocation);
+        if (deletedEventLocation === true) {
+            return res.status(200).send();
         } else {
-            return res.status(404).send("Not found");
+            return res.status(404).send("el id del event_location es inexistente o no pertenece al usuario autenticado.");
         }
     } catch (error) {
         console.log(error);
