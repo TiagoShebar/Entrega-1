@@ -52,25 +52,22 @@ export class Pagination {
 
     static ParseLimit(limit) {
         if(limit === undefined){
-            return 10;
+            limit = 10;
         }
         else if(isNaN(limit) || limit <= 0){
             return false;
         }
-        else{
-            return true;
-        }
+        return limit;
     }
 
     static ParsePage(page) {  
         if(page === undefined){
-           return 0; 
+           page = 1; 
         }
         else if(isNaN(page) || page <= 0){ 
             return false;
-        }else{
-            return true;
         }
+        return page;
     }
 
     

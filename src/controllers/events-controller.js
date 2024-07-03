@@ -15,8 +15,11 @@ router.get("/", async (req, res) => {
     const name = req.query.name;
     const category = req.query.category;
 
-    const offset = verifyPaginationResources(limit, page);
-    if(isNaN(offset)){
+    let offset; 
+    [limit, offset]= verifyPaginationResources(limit, page);
+    if(isNaN(limit)){
+        return res.status(400).send(limit);
+    } else if (isNaN(limit)){
         return res.status(400).send(offset);
     }
 
@@ -31,7 +34,7 @@ router.get("/", async (req, res) => {
         
     }catch(error){ 
         console.log("Error al buscar");
-        return res.json("Un Error");
+        return res.json(error);
     }
     
 });
@@ -39,11 +42,11 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         const event = await eventService.getEventById(req.params.id);
-        if(event){
-            return res.status(200).json(event);
+        if(event === false){
+            return res.status(404).send();
         }
         else{
-            return res.status(404).send();
+            return res.status(200).json(event);
         }
     }
     catch(error){
@@ -61,11 +64,13 @@ router.get("/:id/enrollment", async (req, res) => {
     const attended = req.query.attended;
     const rating = req.query.rating;
 
-    const verificacion = verifyPaginationResources(limit, page);
-    if(verificacion !== true){
-        return res.status(400).send(verificacion);
+    let offset; 
+    [limit, offset]= verifyPaginationResources(limit, page);
+    if(isNaN(limit)){
+        return res.status(400).send(limit);
+    } else if (isNaN(limit)){
+        return res.status(400).send(offset);
     }
-    const offset = page-1;
 
     try {
         const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating, limit, offset, req.originalUrl);

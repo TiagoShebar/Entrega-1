@@ -65,8 +65,9 @@ router.put( "/", AuthMiddleware, async (req,res) =>{
 
 router.delete( "/:id", AuthMiddleware, async (req,res) =>{
     const deleted = await provinceService.deleteProvince(req.params.id);
-    if(deleted > 0){
-        return res.status(200).send(deleted);
+    console.log(deleted);
+    if(deleted === true){
+        return res.status(200).send();
     }
     else{
         return res.status(404).send();
@@ -78,8 +79,11 @@ router.get("/", async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
-    const offset = verifyPaginationResources(limit, page);
-    if(isNaN(offset)){
+    let offset; 
+    [limit, offset]= verifyPaginationResources(limit, page);
+    if(isNaN(limit)){
+        return res.status(400).send(limit);
+    } else if (isNaN(limit)){
         return res.status(400).send(offset);
     }
 
@@ -110,8 +114,11 @@ router.get("/:id/locations", async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
-    const offset = verifyPaginationResources(limit, page);
-    if(isNaN(offset)){
+    let offset; 
+    [limit, offset]= verifyPaginationResources(limit, page);
+    if(isNaN(limit)){
+        return res.status(400).send(limit);
+    } else if (isNaN(limit)){
         return res.status(400).send(offset);
     }
 

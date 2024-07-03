@@ -112,7 +112,13 @@ export class EventRepository {
         const query = this.queryTraerEvento() + " WHERE e.id = $1";
         const values = [id];
         const respuesta = await this.DBClient.query(query, values);
-        return respuesta.rows;
+        if(respuesta.rowCount > 0){
+            return respuesta.rows;
+        }
+        else{
+            return false;
+        }
+        
     }
 
     async getParticipantEvent(id, mensajeCondicion, limit, offset){

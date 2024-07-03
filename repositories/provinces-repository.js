@@ -1,6 +1,7 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 import { json } from 'express';
+import res from 'express/lib/response.js';
 
 
 export class ProvinceRepository {
@@ -30,13 +31,16 @@ export class ProvinceRepository {
         var values = [id];
         const respuesta = await this.DBClient.query(sql,values);
         if(respuesta.rowCount > 0){
-            return 0;
+            sql = "DELETE FROM event_locations WHERE id_location = $1";
+            values = [respuesta.rows[0].id.values];
+            const eliminadoEventLocations = await this.DBClient.query(sql, values);
+            sql = "DELETE FROM locations WHERE id_province = $1";
+            values = [id];
+            const eliminadoLocations = await this.DBClient.query(sql, values);
         }
-        else{
-            sql = "DELETE FROM provinces WHERE id = $1";
-            const eliminado = await this.DBClient.query(sql,values);
-            return eliminado.rowCount;
-        }
+        sql = "DELETE FROM provinces WHERE id = $1";
+        const eliminado = await this.DBClient.query(sql,values);
+        return eliminado.rowCount > 0;
         
     }
 

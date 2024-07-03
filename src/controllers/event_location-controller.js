@@ -13,8 +13,11 @@ router.get("/", AuthMiddleware, async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
-    const offset = verifyPaginationResources(limit, page);
-    if(isNaN(offset)){
+    let offset; 
+    [limit, offset]= verifyPaginationResources(limit, page);
+    if(isNaN(limit)){
+        return res.status(400).send(limit);
+    } else if (isNaN(limit)){
         return res.status(400).send(offset);
     }
 
