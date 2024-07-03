@@ -2,21 +2,20 @@ import express from "express";
 import {ProvincesService} from "../services/provinces-service.js";
 import { Province } from "../entities/province.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
-import { verificarObjeto } from "../utils/objetoVerificacion.js";
-import { Pagination } from "../entities/pagination.js"
+import { verificarObjeto, verifyPaginationResources } from "../utils/functions.js";
 
 const router = express.Router();
 const provinceService = new ProvincesService();
 
 router.post("/", AuthMiddleware, async (req,res)=>{
-    var province = new Province();
-    province = {
-        name: req.body.name,
-        full_name: req.body.full_name,
-        latitude: req.body.latitude,
-        longitude: req.body.longitude,
-        display_order: req.body.display_order
-    }
+    const province = new Province(
+        null, 
+        req.body.name,
+        req.body.full_name,
+        req.body.latitude,
+        req.body.longitude,
+        req.body.display_order
+    );
 
     if(province.display_order === undefined){
         province.display_order = null;
@@ -36,15 +35,15 @@ router.post("/", AuthMiddleware, async (req,res)=>{
 
 
 router.put( "/", AuthMiddleware, async (req,res) =>{
-    var province = new Province();
-    province = {
-        id: req.body.id,
-        name: req.body.name,
-        full_name: req.body.full_name,
-        latitude: req.body.latitude,
-        longitude: req.body.longitude,
-        display_order: req.body.display_order
-    }
+    const province = new Province(
+        req.body.id, 
+        req.body.name,
+        req.body.full_name,
+        req.body.latitude,
+        req.body.longitude,
+        req.body.display_order
+    );
+
 
     if(province.id === undefined){
         return res.status(400).send();
@@ -79,13 +78,9 @@ router.get("/", async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
-    limit = Pagination.ParseLimit(limit);
-    if(limit === false){
-        return res.status(400).send();
-    }
-    const offset = Pagination.ParseOffset(page);
-    if(offset === false){
-        return res.status(400).send();
+    const offset = verifyPaginationResources(limit, page);
+    if(isNaN(offset)){
+        return res.status(400).send(offset);
     }
 
     try{
@@ -115,13 +110,9 @@ router.get("/:id/locations", async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
-    limit = Pagination.ParseLimit(limit);
-    if(limit === false){
-        return res.status(400).send();
-    }
-    const offset = Pagination.ParseOffset(page);
-    if(offset === false){
-        return res.status(400).send();
+    const offset = verifyPaginationResources(limit, page);
+    if(isNaN(offset)){
+        return res.status(400).send(offset);
     }
 
     try {

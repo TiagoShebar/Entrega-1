@@ -1,9 +1,8 @@
 import express from "express";
 import {EventsService} from "../services/events-service.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
-import { verificarObjeto } from "../utils/objetoVerificacion.js";
+import { verificarObjeto, verifyPaginationResources } from "../utils/functions.js";
 import { Event } from "../entities/event.js";
-import { Pagination } from "../entities/pagination.js"
 
 const router = express.Router();
 const eventService = new EventsService();
@@ -16,15 +15,10 @@ router.get("/", async (req, res) => {
     const name = req.query.name;
     const category = req.query.category;
 
-    limit = Pagination.ParseLimit(limit);
-    if(limit === false){
-        return res.status(400).send();
+    const offset = verifyPaginationResources(limit, page);
+    if(isNaN(offset)){
+        return res.status(400).send(offset);
     }
-    const offset = Pagination.ParseOffset(page);
-    if(offset === false){
-        return res.status(400).send();
-    }
-
 
     try{
         const allEvents = await eventService.getEvent(offset, limit, tag, start_date, name, category, req.originalUrl);
@@ -67,18 +61,14 @@ router.get("/:id/enrollment", async (req, res) => {
     const attended = req.query.attended;
     const rating = req.query.rating;
 
-    limit = Pagination.ParseLimit(limit);
-    if(limit === false){
-        return res.status(400).send();
+    const verificacion = verifyPaginationResources(limit, page);
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
     }
-    const offset = Pagination.ParseOffset(page);
-    if(offset === false){
-        return res.status(400).send();
-    }
+    const offset = page-1;
 
     try {
         const participants = await eventService.getParticipantEvent(req.params.id, first_name, last_name, username, attended, rating, limit, offset, req.originalUrl);
-        console.log(participants);
         if(participants){
             return res.json(participants);
         }

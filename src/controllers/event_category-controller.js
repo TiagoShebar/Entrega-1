@@ -2,7 +2,7 @@ import express from "express";
 import {EventCategoryService} from "../services/event_category-service.js";
 import { EventCategory } from "../entities/event_category.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
-import { verificarObjeto } from "../utils/objetoVerificacion.js";
+import { verificarObjeto, verifyPaginationResources } from "../utils/functions.js";
 import { Pagination } from "../entities/pagination.js"
 
 const router = express.Router();
@@ -12,13 +12,9 @@ router.get("/", async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
-    limit = Pagination.ParseLimit(limit);
-    if(limit === false){
-        return res.status(400).send();
-    }
-    const offset = Pagination.ParseOffset(page);
-    if(offset === false){
-        return res.status(400).send();
+    const offset = verifyPaginationResources(limit, page);
+    if(isNaN(offset)){
+        return res.status(400).send(offset);
     }
 
     try{

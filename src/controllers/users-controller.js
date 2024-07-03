@@ -1,7 +1,7 @@
 import express from "express";
 import {UsersService} from "../services/users-service.js";
 import { User } from "../entities/user.js";
-import { verificarObjeto } from "../utils/objetoVerificacion.js"; 
+import { verificarObjeto } from "../utils/functions.js"; 
 
 const router = express.Router();
 const userService = new UsersService();

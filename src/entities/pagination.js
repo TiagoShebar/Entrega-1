@@ -1,6 +1,5 @@
 export class Pagination {
     static BuildPagination(collection, limit, offset, url, total){
-        console.log(url);
         return {
             collection: collection,
             pagination: {
@@ -59,18 +58,18 @@ export class Pagination {
             return false;
         }
         else{
-            return limit;
+            return true;
         }
     }
 
-    static ParseOffset(page) {  
+    static ParsePage(page) {  
         if(page === undefined){
            return 0; 
         }
         else if(isNaN(page) || page <= 0){ 
             return false;
         }else{
-            return page-1;
+            return true;
         }
     }
 

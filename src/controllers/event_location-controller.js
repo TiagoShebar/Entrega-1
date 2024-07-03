@@ -2,8 +2,8 @@
 import express from "express";
 import { EventLocationService } from "../services/event_location-service.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
-import { Pagination } from "../entities/pagination.js"
 import { EventLocation } from "../entities/event_location.js";
+import { verifyPaginationResources } from "../utils/functions.js";
 
 const router = express.Router();
 const eventLocationService = new EventLocationService();
@@ -13,13 +13,9 @@ router.get("/", AuthMiddleware, async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
-    limit = Pagination.ParseLimit(limit);
-    if(limit === false){
-        return res.status(400).send();
-    }
-    const offset = Pagination.ParseOffset(page);
-    if(offset === false){
-        return res.status(400).send();
+    const offset = verifyPaginationResources(limit, page);
+    if(isNaN(offset)){
+        return res.status(400).send(offset);
     }
 
     try {

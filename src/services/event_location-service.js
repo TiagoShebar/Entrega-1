@@ -1,7 +1,7 @@
 //PUNTO 13, fijarse si funciona y si se ejcuta en algun momento
 import { EventLocationRepository } from "../../repositories/event_location-repository.js";
 import { Pagination } from "../entities/pagination.js"
-import { verifyLength } from "../utils/objetoVerificacion.js";
+import { verifyLength } from "../utils/functions.js";
 
 export class EventLocationService {
     constructor() {

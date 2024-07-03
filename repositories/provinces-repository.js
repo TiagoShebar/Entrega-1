@@ -57,7 +57,6 @@ export class ProvinceRepository {
         }
         const values = [province.id];
         const respuesta = await this.DBClient.query(sql,values);
-        console.log(respuesta.rowCount);
         return respuesta.rowCount;
         
     }

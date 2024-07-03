@@ -1,7 +1,7 @@
 import { query } from "express";
 import { EventCategoryRepository } from "../../repositories/event_category-repository.js";
 import { Pagination } from "../entities/pagination.js"
-import { verifyLength } from "../utils/objetoVerificacion.js";
+import { verifyLength } from "../utils/functions.js";
 
 export class EventCategoryService {
     constructor() {

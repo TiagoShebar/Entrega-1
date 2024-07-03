@@ -23,7 +23,6 @@ export class ProvincesService{
         if(verificacion){
             const resultado = await this.bd.updateProvince(province);
             if(resultado > 0){
-                console.log("holaaa");
                 return [true,null];
             }
             else{
