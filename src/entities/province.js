@@ -7,4 +7,19 @@ export class Province {
         this.longitude = longitude;
         this.display_order = display_order;
     }
+
+    verifyObject(){
+        if(this.latitude !== undefined && this.latitude !== null && !Number.isInteger(parseFloat(this.latitude))){
+            return "Error: 'latitude' debe ser un número entero.";
+        }
+        if(this.longitude !== undefined && this.longitude !== null && !Number.isInteger(parseFloat(this.longitude))){
+            return "Error: 'longitude' debe ser un número entero.";
+        }
+        if(this.display_order !== undefined && this.display_order !== null && !Number.isInteger(parseFloat(this.display_order))){
+            return "Error: 'display_order' debe ser un número entero.";
+        }
+
+        return true;
+
+    }
 }

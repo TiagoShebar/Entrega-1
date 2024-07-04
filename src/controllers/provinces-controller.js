@@ -17,8 +17,9 @@ router.post("/", AuthMiddleware, async (req,res)=>{
         req.body.display_order
     );
 
-    if(province.display_order === undefined){
-        province.display_order = null;
+    const verificacion = province.verifyObject();
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
     }
     
         const [provincia,mensaje] = await provinceService.createProvince(province);
