@@ -51,9 +51,12 @@ router.post("/", async (req, res) => {
         req.body.display_order
     );
 
-    /*if(verificarObjeto(event_category)){
 
-    }*/
+    const verificacion = event_category.verifyObject();
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
+    }
+
     try {
         const event_categoryCreado = await eventCategoryService.createEventCategory(event_category);
         if(event_categoryCreado === false){

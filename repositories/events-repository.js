@@ -1,5 +1,6 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
+import { makeUpdate } from '../src/utils/functions.js';
 
 
 export class EventRepository {
@@ -171,7 +172,7 @@ export class EventRepository {
             }
         }
         catch(error){
-            return [400, error.detail];
+            return [400, error];
         }
         
        
@@ -184,40 +185,32 @@ export class EventRepository {
         return max_capacity.rows[0] === undefined ? max_capacity.rows[0] : max_capacity.rows[0].max_capacity;
     }
 
-    async updateEvent(event, userId){
+    async updateEvent(event){
         try {
-            const max_capacity = await this.traerMaxCapacity(event.id_event_location);
+            
             if(event.max_assistance > max_capacity){
-                return [400, "El max_assistance es mayor que el max_capacity del  id_event_location."]
+                return [400, "El max_assistance es mayor que el max_capacity del id_event_location."]
             }
     
             var sql;
             sql = `SELECT id from events WHERE id=$1 AND id_creator_user=$2`;
-            var values = [event.id, userId];
+            var values = [event.id, event.id_creator_user];
             var respuesta = await this.DBClient.query(sql,values);
             
             if(respuesta.rowCount == 0){
                 return [404, "el id del evento no existe, o el evento no pertenece al usuario autenticado."];
             }
             else {
-                const attributes = [];
-            
-                if (event.name) attributes.push(`name = '${event.name}'`);
-                if (event.description) attributes.push(`description = '${event.description}'`);
-                if (event.id_event_category) attributes.push(`id_event_category = ${event.id_event_category}`);
-                if (event.id_event_location) attributes.push(`id_event_location = ${event.id_event_location}`);
-                if (event.start_date) attributes.push(`start_date = '${event.start_date}'`);
-                if (event.duration_in_minutes) attributes.push(`duration_in_minutes = ${event.duration_in_minutes}`);
-                if (event.price) attributes.push(`price = ${event.price}`);
-                if (event.enabled_for_enrollment) attributes.push(`enabled_for_enrollment = ${event.enabled_for_enrollment}`);
-                if (event.max_assistance) attributes.push(`max_assistance = ${event.max_assistance}`);
-                if (event.id_creator_user) attributes.push(`id_creator_user = ${event.id_creator_user}`);
-            
-                if (attributes.length > 0) {
-                    sql = `UPDATE events SET ${attributes.join(', ')} WHERE id = $1 AND id_creator_user = $2`;
-                    values = [event.id, userId];
-                    respuesta = await this.DBClient.query(sql, values);
+                const [attributes, valuesSet] = makeUpdate(event, {"id": event.id, "id_creator_user": event.id_creator_user});
+                let query;
+                if(attributes.length > 0){
+                    query = `UPDATE events SET ${attributes.join(',')} WHERE id = $${valuesSet.length+1} AND id_creator_user = $${valuesSet.length+2}`;
                 }
+                else{
+                    query = `SELECT id FROM events WHERE id = $${valuesSet.length+1} AND id_creator_user = $${valuesSet.length+2}`
+                }
+        
+                const result = await this.DBClient.query(query, [...valuesSet, event.id, event.id_creator_user]);
                 return [200, null];
             }
         }
@@ -373,8 +366,14 @@ async updateEvent(event, userId) {
             if(existe.rowCount > 0){
                 if(evento.rows[0].start_date <= new Date()){
                     if(rating >= 1 && rating <= 10){
-                        sql = "UPDATE event_enrollments SET rating = $1, observations = $2 WHERE id_event = $3 AND id_user = $4";
-                        values = [rating, observations, id_event, id_user];
+                        if(observations !== undefined){
+                            sql = "UPDATE event_enrollments SET rating = $1, observations = $2 WHERE id_event = $3 AND id_user = $4";
+                            values = [rating, observations, id_event, id_user];
+                        }else{
+                            sql = "UPDATE event_enrollments SET rating = $1 WHERE id_event = $3 AND id_user = $4";
+                            values = [rating, id_event, id_user];
+                        }
+                        
                         const enrollmentActualizado = await this.DBClient.query(sql, values);
                         if(enrollmentActualizado.rowCount > 0){
                             return [200, null];

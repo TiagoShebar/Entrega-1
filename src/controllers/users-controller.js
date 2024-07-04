@@ -42,10 +42,11 @@ router.post("/register", async (req,res)=>{
         req.body.password
     );
 
-    if(!verificarObjeto(user)){
-        return res.status(400).send();
+    const verificacion = user.verifyObject();
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
     }
-    else{
+        
         if(!validarFormatoEmail(user.username)){
             return res.status(400).send("El email es invalido.");
         }
@@ -62,7 +63,6 @@ router.post("/register", async (req,res)=>{
                 return res.status(400).send("ya existe el nombre de usuario");
             }
         }
-    }
     
 });
 

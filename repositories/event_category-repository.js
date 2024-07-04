@@ -1,5 +1,6 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
+import { makeUpdate } from '../src/utils/functions.js';
 
 export class EventCategoryRepository {
     constructor() {
@@ -30,8 +31,16 @@ export class EventCategoryRepository {
     }
 
     async updateEventCategory(event_category){
-        const query = "INSERT INTO event_categories (name, display_order) VALUES ($2, $3) WHERE id = $1";
-        const result = await this.DBClient.query(query, [event_category.id, event_category.name, event_category.display_order]);
+        const [attributes, valuesSet] = makeUpdate(event_category, {"id": event_category.id});
+        let query;
+        if(attributes.length > 0){
+            query = `UPDATE event_categories SET ${attributes.join(',')} WHERE id = $${valuesSet.length+1}`;
+        }
+        else{
+            query = `SELECT id FROM event_categories WHERE id = $${valuesSet.length+1}`
+        }
+ 
+        const result = await this.DBClient.query(query, [...valuesSet, event_category.id]);
         return result.rowCount > 0;
     }
 

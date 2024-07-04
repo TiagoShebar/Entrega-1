@@ -101,21 +101,20 @@ router.post("/", AuthMiddleware, async (req, res) => {
         req.body.price,
         req.body.enabled_for_enrollment,
         req.body.max_assistance,
-        req.body.id_creator_user
+        req.user.id
     );
     
-    if(verificarObjeto(event)){
+    const verificacion = event.verifyObject();
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
+    }
+
         const [statusCode, mensaje] = await eventService.createEvent(event);
         return res.status(statusCode).send(mensaje);
-    }
-    else{
-        return res.status(400).send();
-    }
     
 });
 
 router.put("/", AuthMiddleware, async (req,res) =>{
-    const userId = req.user.id;
     const event = new Event(
         req.body.id,
         req.body.name,
@@ -127,13 +126,15 @@ router.put("/", AuthMiddleware, async (req,res) =>{
         req.body.price,
         req.body.enabled_for_enrollment,
         req.body.max_assistance,
-        req.body.id_creator_user
+        req.user.id
     );
+
+
     if(event.id === undefined){
         return res.status(400).send();
     }
     else{
-        const [statusCode, mensaje] = await eventService.updateEvent(event, userId);
+        const [statusCode, mensaje] = await eventService.updateEvent(event);
         return res.status(statusCode).send(mensaje);
     }
 });

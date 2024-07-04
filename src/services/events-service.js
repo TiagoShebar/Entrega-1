@@ -109,38 +109,10 @@ export class EventsService {
         }
     }
 
-//PUNTO 8. Verificar que esto funcione. Me pa que está mal
-/*
-async createEvent(event) {
-    const errorMessage = this.validateEvent(event);
-    if (errorMessage) {
-        return [400, errorMessage];
-    }
-    return await this.bd.createEvent(event);
-}
-
-async updateEvent(event, userId) {
-    const errorMessage = this.validateEvent(event);
-    if (errorMessage) {
-        return [400, errorMessage];
-    }
-    return await this.bd.updateEvent(event, userId);
-}
-
-validateEvent(event) {
-    if (!event.name || !event.description || event.name.length < 3 || event.description.length < 3) {
-        return "El nombre o la descripción están vacíos o tienen menos de tres (3) letras.";
-    }
-    if (event.price < 0 || event.duration_in_minutes < 0) {
-        return "El precio o la duración en minutos son menores que cero.";
-    }
-    return null;
-}
-*/
-    async updateEvent(event, userId){
+    async updateEvent(event){
         const mensaje = this.verificarEvento(event);
         if(mensaje == null){
-            const [statusCode, mensaje] = await this.bd.updateEvent(event, userId);
+            const [statusCode, mensaje] = await this.bd.updateEvent(event);
             return [statusCode, mensaje];
         }
         else{

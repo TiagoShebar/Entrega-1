@@ -1,7 +1,7 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 import { json } from 'express';
-import res from 'express/lib/response.js';
+import { makeUpdate } from '../src/utils/functions.js';
 
 
 export class ProvinceRepository {
@@ -45,22 +45,16 @@ export class ProvinceRepository {
     }
 
     async updateProvince(province) {
-        const attributes = [];
-        
-        if(province.name) attributes.push(`name = '${province.name}'`);
-        if(province.full_name) attributes.push(`full_name = '${province.full_name}'`);
-        if(province.latitude) attributes.push(`latitude = ${province.latitude}`);
-        if(province.longitude) attributes.push(`longitude = ${province.longitude}`);
-        if(province.display_order) attributes.push(`display_order = ${province.display_order}`);
-        var sql;
-        if(attributes.length == 0){
-            sql = `SELECT id from provinces WHERE id=$1`;
-        }
-        else{
-            sql =`UPDATE provinces SET ${attributes.join(',')} WHERE id = $1`;
-        }
-        const values = [province.id];
-        const respuesta = await this.DBClient.query(sql,values);
+        const [attributes, valuesSet] = makeUpdate(province, {"id": province.id});
+        let query;
+            if(attributes.length > 0){
+                query = `UPDATE provinces SET ${attributes.join(',')} WHERE id = $${valuesSet.length+1}`;
+            }
+            else{
+                query = `SELECT id FROM provinces WHERE id = $${valuesSet.length+1}`
+            }
+        const values = [...valuesSet, province.id];
+        const respuesta = await this.DBClient.query(query,values);
         return respuesta.rowCount;
         
     }

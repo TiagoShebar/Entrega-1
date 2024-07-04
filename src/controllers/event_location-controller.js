@@ -57,6 +57,11 @@ router.post("/", AuthMiddleware, async (req, res) => {
         req.user.id
     );
 
+    const verificacion = eventLocation.verifyObject();
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
+    }
+
     try {
         const created = await eventLocationService.createEventLocation(eventLocation);
         if(created === true){
