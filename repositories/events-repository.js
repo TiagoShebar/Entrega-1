@@ -187,7 +187,7 @@ export class EventRepository {
 
     async updateEvent(event){
         try {
-            
+            const max_capacity = this.traerMaxCapacity();
             if(event.max_assistance > max_capacity){
                 return [400, "El max_assistance es mayor que el max_capacity del id_event_location."]
             }

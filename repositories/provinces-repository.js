@@ -31,8 +31,16 @@ export class ProvinceRepository {
         var values = [id];
         const respuesta = await this.DBClient.query(sql,values);
         if(respuesta.rowCount > 0){
+            sql = "SELECT id FROM event_locations WHERE id_location = $1";
+            values = [respuesta.rows[0].id];
+            const eventLocation = await this.DBClient.query(sql, values);
+            if(eventLocation.rowCount > 0){
+                sql = "UPDATE events SET id_event_location = null WHERE id_event_location = $1";
+                values = [eventLocation.rows[0].id];
+                const updateEvent = await this.DBClient.query(sql, values);
+            }
             sql = "DELETE FROM event_locations WHERE id_location = $1";
-            values = [respuesta.rows[0].id.values];
+            values = [respuesta.rows[0].id];
             const eliminadoEventLocations = await this.DBClient.query(sql, values);
             sql = "DELETE FROM locations WHERE id_province = $1";
             values = [id];

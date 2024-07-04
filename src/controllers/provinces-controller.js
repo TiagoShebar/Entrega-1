@@ -46,7 +46,7 @@ router.put( "/", AuthMiddleware, async (req,res) =>{
 
 
     if(province.id === undefined){
-        return res.status(400).send();
+        return res.status(400).send("El id debe ser ingresado");
     }else{
         const [provincia,mensaje] = await provinceService.updateProvince(province);
         if(provincia){
