@@ -2,8 +2,7 @@ import express from "express";
 import {EventCategoryService} from "../services/event_category-service.js";
 import { EventCategory } from "../entities/event_category.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
-import { verificarObjeto, verifyPaginationResources } from "../utils/functions.js";
-import { Pagination } from "../entities/pagination.js"
+import { verifyPaginationResources } from "../utils/functions.js";
 
 const router = express.Router();
 const eventCategoryService = new EventCategoryService();

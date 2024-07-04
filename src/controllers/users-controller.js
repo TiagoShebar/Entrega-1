@@ -1,7 +1,7 @@
 import express from "express";
 import {UsersService} from "../services/users-service.js";
 import { User } from "../entities/user.js";
-import { verificarObjeto } from "../utils/functions.js"; 
+import { verifyLength } from "../utils/functions.js"; 
 
 const router = express.Router();
 const userService = new UsersService();
@@ -51,7 +51,8 @@ router.post("/register", async (req,res)=>{
             return res.status(400).send("El email es invalido.");
         }
         const mensaje = revisarCampos(user);
-        if(mensaje != null){
+        console.log(mensaje);
+        if(mensaje !== null){
             return res.status(400).send(mensaje);
         }
         else{
@@ -72,16 +73,13 @@ const validarFormatoEmail = (email) => {
 }
 
 const revisarCampos = (user) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!user.first_name || !user.last_name){
-        return "El nombre y apellido son obligatorios";
+    if(!verifyLength(user.first_name) || !verifyLength(user.last_name)){
+        return "El nombre y apellido deben tener al menos 3 caracteres";
     }
-    else if(user.password.length < 3){
+    else if(!verifyLength(user.password)){
         return "La contraseña debe tener al menos 3 caracteres";
     }
-    else{
-        return null;
-    }
+    return null;
 }
 
 export default router;

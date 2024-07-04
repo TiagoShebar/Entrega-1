@@ -34,14 +34,14 @@ export class UserRepository {
             var query = "SELECT * FROM users WHERE username = $1";
             var values = [user.username];
             var respuesta = await this.DBClient.query(query, values);
-            if(respuesta.rowCount == 0){
+            if(respuesta.rowCount > 0){
+                return false;
+            }
+            else{
                 query = "INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)";
                 values = [user.first_name, user.last_name, user.username, user.password];
                 respuesta = await this.DBClient.query(query, values);
                 return true;
-            }
-            else{
-                return false;
             }
             
         }

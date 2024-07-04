@@ -20,5 +20,6 @@ export class User {
         if(this.password === undefined || this.password === null){
             return "Error: 'password' no puede ser null ni estar vacío.";
         }
+        return true;
     }
 }

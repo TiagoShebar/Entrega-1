@@ -1,7 +1,7 @@
 import express from "express";
 import {EventsService} from "../services/events-service.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
-import { verificarObjeto, verifyPaginationResources } from "../utils/functions.js";
+import { verifyPaginationResources } from "../utils/functions.js";
 import { Event } from "../entities/event.js";
 
 const router = express.Router();

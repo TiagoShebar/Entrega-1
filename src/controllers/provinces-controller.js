@@ -2,7 +2,7 @@ import express from "express";
 import {ProvincesService} from "../services/provinces-service.js";
 import { Province } from "../entities/province.js";
 import { AuthMiddleware } from "../auth/AuthMiddleware.js";
-import { verificarObjeto, verifyPaginationResources } from "../utils/functions.js";
+import { verifyPaginationResources } from "../utils/functions.js";
 
 const router = express.Router();
 const provinceService = new ProvincesService();
@@ -21,7 +21,6 @@ router.post("/", AuthMiddleware, async (req,res)=>{
         province.display_order = null;
     }
     
-    if(verificarObjeto(province)){
         const [provincia,mensaje] = await provinceService.createProvince(province);
         if(provincia){
             return res.status(201).send();  
@@ -29,7 +28,7 @@ router.post("/", AuthMiddleware, async (req,res)=>{
         else{
             return res.status(400).send(mensaje);
         }
-    }
+    
     return res.status(400).send("Error en los campos");
 });
 

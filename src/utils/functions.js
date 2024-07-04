@@ -1,14 +1,5 @@
-export const verificarObjeto = (obj) => {
-    for (const key in obj) {
-        if (obj.hasOwnProperty(key) && obj[key] === undefined) {
-            return false;
-        }
-    }
-    return true;
-}
-
 export const verifyLength = (string) => {
-    return toString(string).length >= 3;
+    return String(string).length >= 3;
 }
 
 import { Pagination } from "../entities/pagination.js";
