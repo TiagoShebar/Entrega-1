@@ -20,7 +20,7 @@ export class EventCategoryService {
 
     async createEventCategory(event_category){
         if(!verifyLength(event_category.name)){
-            return false;
+            return "El nombre (name) está vacío o tiene menos de tres (3) letras";
         }
         else{
             const creation = await this.bd.createEventCategory(event_category);
@@ -29,8 +29,14 @@ export class EventCategoryService {
     }
 
     async updateEventCategory(event_category){
-        const result = await this.bd.updateEventCategory(event_category);
-        return result;
+        if(!verifyLength(event_category.name)){
+            return "El nombre (name) está vacío o tiene menos de tres (3) letras";
+        }
+        else{
+            const result = await this.bd.updateEventCategory(event_category);
+            return result;
+        }
+        
     }
 
     async deleteEventCategory(id){

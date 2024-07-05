@@ -57,7 +57,7 @@ router.post("/", AuthMiddleware, async (req, res) => {
         req.user.id
     );
 
-    const verificacion = eventLocation.verifyObject();
+    const verificacion = eventLocation.verifyObject(false);
     if(verificacion !== true){
         return res.status(400).send(verificacion);
     }
@@ -90,6 +90,11 @@ router.put("/", AuthMiddleware, async (req, res) => {
         req.body.longitude,
         req.user.id
     );
+
+    const verificacion = eventLocation.verifyObject(true);
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
+    }
 
     if(eventLocation.id === undefined){
         return res.status(400).send("id no puesto");

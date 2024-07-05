@@ -7,7 +7,7 @@ import { verifyPaginationResources } from "../utils/functions.js";
 const router = express.Router();
 const provinceService = new ProvincesService();
 
-router.post("/", AuthMiddleware, async (req,res)=>{
+router.post("/", async (req,res)=>{
     const province = new Province(
         null, 
         req.body.name,
@@ -17,7 +17,7 @@ router.post("/", AuthMiddleware, async (req,res)=>{
         req.body.display_order
     );
 
-    const verificacion = province.verifyObject();
+    const verificacion = province.verifyObject(false);
     if(verificacion !== true){
         return res.status(400).send(verificacion);
     }
@@ -29,12 +29,10 @@ router.post("/", AuthMiddleware, async (req,res)=>{
         else{
             return res.status(400).send(mensaje);
         }
-    
-    return res.status(400).send("Error en los campos");
 });
 
 
-router.put( "/", AuthMiddleware, async (req,res) =>{
+router.put( "/", async (req,res) =>{
     const province = new Province(
         req.body.id, 
         req.body.name,
@@ -44,6 +42,10 @@ router.put( "/", AuthMiddleware, async (req,res) =>{
         req.body.display_order
     );
 
+    const verificacion = province.verifyObject(true);
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
+    }
 
     if(province.id === undefined){
         return res.status(400).send("El id debe ser ingresado");
@@ -63,7 +65,7 @@ router.put( "/", AuthMiddleware, async (req,res) =>{
         
 });
 
-router.delete( "/:id", AuthMiddleware, async (req,res) =>{
+router.delete( "/:id", async (req,res) =>{
     const deleted = await provinceService.deleteProvince(req.params.id);
     console.log(deleted);
     if(deleted === true){

@@ -27,7 +27,7 @@ export class EventCategoryRepository {
         const query = `INSERT INTO event_categories (name, display_order) VALUES ($1, $2)`;
         const values = [event_category.name, event_category.display_order];
         const result = await this.DBClient.query(query, values);
-        return result.rowCount;
+        return result.rowCount > 0;
     }
 
     async updateEventCategory(event_category){

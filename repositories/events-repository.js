@@ -1,6 +1,7 @@
 import pg from 'pg';
 import { DBConfig } from "./dbconfig.js";
 import { makeUpdate } from '../src/utils/functions.js';
+import { query } from 'express';
 
 
 export class EventRepository {
@@ -157,8 +158,9 @@ export class EventRepository {
         try{
             const max_capacity = await this.traerMaxCapacity(event.id_event_location);
             if(max_capacity === undefined || event.max_assistance <= max_capacity){
+                console.log(event.enabled_for_enrollment);
                 const query = "INSERT INTO events (name,description,id_event_category,id_event_location,start_date,duration_in_minutes,price,enabled_for_enrollment,max_assistance,id_creator_user) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)";
-                const values = [event.name, event.description, event.id_event_category, event.id_event_location, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrrolment, event.max_assistance, event.id_creator_user];
+                const values = [event.name, event.description, event.id_event_category, event.id_event_location, event.start_date, event.duration_in_minutes, event.price, event.enabled_for_enrollment, event.max_assistance, event.id_creator_user];
                 const resultado = await this.DBClient.query(query, values);
                 if(resultado.rowCount > 0){
                     return [201, null];
@@ -292,23 +294,32 @@ async updateEvent(event, userId) {
                 if(evento.rows[0].start_date <= new Date()){
                     return [400, "El evento ya ocurrió"];
                 }
-                else if(evento.rows[0].enabled_for_enrollment == false){
+                else if(evento.rows[0].enabled_for_enrollment !== true){
                     return [400, "El evento no está habilitado para inscripciones"];
                 }
                 else{
-                    sql = "SELECT COUNT(id) AS cantidad FROM event_enrollments WHERE id_event = $1";
-                    values = [id_event];
-                    const cantidad = await this.DBClient.query(sql, values);
-                    if(cantidad.rows[0].cantidad < evento.rows[0].max_assistance){
-                        sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
-                        values = [id_event, id_user];
-                        
-                        const insert = await this.DBClient.query(sql, values);
-                        return [200, null];
+                    sql = "SELECT id FROM event_enrollments WHERE id_event = $1 AND id_user = $2";
+                    values = [id_event, id_user];
+                    const yaExisteEnrollment = await this.DBClient.query(sql,values);
+                    if(yaExisteEnrollment.rowCount > 0){
+                        return [400, "El usuario ya se encuentra registrado en el evento"];
                     }
                     else{
-                        return [400, "El evento ya alcanzó su máxima capacidad"];
+                        sql = "SELECT COUNT(id) AS cantidad FROM event_enrollments WHERE id_event = $1";
+                        values = [id_event];
+                        const cantidad = await this.DBClient.query(sql, values);
+                        if(cantidad.rows[0].cantidad < evento.rows[0].max_assistance){
+                            sql = "INSERT INTO event_enrollments (id_event,id_user,description,registration_date_time,attended,observations,rating) VALUES ($1,$2,null,CURRENT_TIMESTAMP,null,null,null)";
+                            values = [id_event, id_user];
+                            
+                            const insert = await this.DBClient.query(sql, values);
+                            return [200, null];
+                        }
+                        else{
+                            return [400, "El evento ya alcanzó su máxima capacidad"];
+                        }
                     }
+                    
                 }
             }
         }
@@ -330,7 +341,7 @@ async updateEvent(event, userId) {
             sql = "SELECT id from event_enrollments WHERE id_event = $1 AND id_user = $2";
             values = [id_event, id_user];
             const existe = await this.DBClient.query(sql, values);
-            if(existe.rowCount == 0){
+            if(existe.rowCount === 0){
                 return [400, "Se intenta remover de un evento en el que no esta registrado"];
             }
             else{

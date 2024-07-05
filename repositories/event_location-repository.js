@@ -44,12 +44,19 @@ export class EventLocationRepository {
             let query = "SELECT * FROM event_locations WHERE id=$1 AND id_creator_user=$2";
             const existeEventLocation = await this.DBClient.query(query, [eventLocation.id, eventLocation.id_creator_user]);
             if(existeEventLocation.rowCount > 0){
-                const [attributes, valuesSet] = makeUpdate(eventLocation, {"id": eventLocation.id, "id_creator_user": eventLocation.id_creator_user});
-                if(attributes.length > 0){
-                    query = `UPDATE event_locations SET ${attributes.join(',')} WHERE id = $${valuesSet.length+1} AND id_creator_user = $${valuesSet.length+2}`;
-                    const result = await this.DBClient.query(query, [...valuesSet, eventLocation.id, eventLocation.id_creator_user]);
+                query = "SELECT * FROM locations WHERE id = $1";
+                const existeLocation = await this.DBClient.query(query, [eventLocation.id_location]);
+                if(existeLocation.rowCount > 0){
+                    const [attributes, valuesSet] = makeUpdate(eventLocation, {"id": eventLocation.id, "id_creator_user": eventLocation.id_creator_user});
+                    if(attributes.length > 0){
+                        query = `UPDATE event_locations SET ${attributes.join(',')} WHERE id = $${valuesSet.length+1} AND id_creator_user = $${valuesSet.length+2}`;
+                        const result = await this.DBClient.query(query, [...valuesSet, eventLocation.id, eventLocation.id_creator_user]);
+                    }
+                    return [200, null];
+                }else{
+                    return [400, "El id_location es inexistente"];
                 }
-                return [200, null];
+                
             }
             else{
                 return [404, "el id del event_location es inexistente o no pertenece al usuario autenticado."];

@@ -8,18 +8,35 @@ export class Province {
         this.display_order = display_order;
     }
 
-    verifyObject(){
-        if(this.latitude !== undefined && this.latitude !== null && !Number.isInteger(parseFloat(this.latitude))){
-            return "Error: 'latitude' debe ser un número entero.";
+    verifyObject(isUpdate = false) {
+        // Validación para 'latitude'
+        if (this.latitude !== undefined && this.latitude !== null) {
+            const latitudeValue = parseFloat(this.latitude);
+            if (isNaN(latitudeValue) || !Number.isInteger(latitudeValue)) {
+                return "Error: 'latitude' debe ser un número entero válido.";
+            }
+            this.latitude = latitudeValue;
         }
-        if(this.longitude !== undefined && this.longitude !== null && !Number.isInteger(parseFloat(this.longitude))){
-            return "Error: 'longitude' debe ser un número entero.";
+    
+        // Validación para 'longitude'
+        if (this.longitude !== undefined && this.longitude !== null) {
+            const longitudeValue = parseFloat(this.longitude);
+            if (isNaN(longitudeValue) || !Number.isInteger(longitudeValue)) {
+                return "Error: 'longitude' debe ser un número entero válido.";
+            }
+            this.longitude = longitudeValue;
         }
-        if(this.display_order !== undefined && this.display_order !== null && !Number.isInteger(parseFloat(this.display_order))){
-            return "Error: 'display_order' debe ser un número entero.";
+    
+        // Validación para 'display_order'
+        if (this.display_order !== undefined && this.display_order !== null) {
+            const displayOrderValue = parseFloat(this.display_order);
+            if (isNaN(displayOrderValue) || !Number.isInteger(displayOrderValue)) {
+                return "Error: 'display_order' debe ser un número entero válido.";
+            }
+            this.display_order = displayOrderValue;
         }
-
+    
         return true;
-
     }
+    
 }

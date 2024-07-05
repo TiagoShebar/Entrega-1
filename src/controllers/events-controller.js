@@ -104,7 +104,8 @@ router.post("/", AuthMiddleware, async (req, res) => {
         req.user.id
     );
     
-    const verificacion = event.verifyObject();
+    
+    const verificacion = event.verifyObject(false);
     if(verificacion !== true){
         return res.status(400).send(verificacion);
     }
@@ -130,9 +131,15 @@ router.put("/", AuthMiddleware, async (req,res) =>{
     );
 
 
+    const verificacion = event.verifyObject(true);
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
+    }
+
+
     if(event.id === undefined){
         return res.status(400).send();
-    }
+    }   
     else{
         const [statusCode, mensaje] = await eventService.updateEvent(event);
         return res.status(statusCode).send(mensaje);

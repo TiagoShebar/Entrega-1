@@ -43,7 +43,7 @@ router.get("/:id", async (req, res) => {
     
 });
 
-router.get("/:id/event_location", AuthMiddleware, async (req, res) => {
+router.get("/:id/event-location", AuthMiddleware, async (req, res) => {
     let limit = req.query.limit;
     const page = req.query.page;
 
@@ -57,7 +57,7 @@ router.get("/:id/event_location", AuthMiddleware, async (req, res) => {
 
     try {
         const event_locations = await locationService.getEventLocationsByIdLocation(limit, offset, req.originalUrl, req.params.id);
-        if(event_locations != -1){
+        if(event_locations !== false){
             return res.status(200).json(event_locations);
         }
         else{

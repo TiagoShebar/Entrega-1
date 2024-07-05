@@ -10,15 +10,16 @@ export class EventLocation {
         this.id_creator_user = id_creator_user;
     }
 
-    verifyObject() {
+    verifyObject(isUpdate = false) {
         // Validación para 'max_capacity'
-            const parsedValue = parseFloat(this.max_capacity);
-            if (isNaN(parsedValue)) {
-                return "Error: 'max_capacity' debe ser un número decimal válido.";
-            }
-            this.max_capacity = parsedValue; // Convertimos el valor a número si es válido
-        
-
+        const parsedMaxCapacity = parseFloat(this.max_capacity);
+        if (this.max_capacity !== undefined && (isNaN(parsedMaxCapacity) || this.max_capacity === null)) {
+            return "Error: 'max_capacity' debe ser un número decimal válido y no puede ser nulo.";
+        }
+        if (this.max_capacity !== undefined) {
+            this.max_capacity = parsedMaxCapacity; // Convertimos el valor a número si es válido
+        }
+    
         // Validación para 'latitude'
         if (this.latitude !== null && this.latitude !== undefined) {
             const latitudeValue = parseFloat(this.latitude);
@@ -27,7 +28,7 @@ export class EventLocation {
             }
             this.latitude = latitudeValue; // Convertimos el valor a número si es válido
         }
-
+    
         // Validación para 'longitude'
         if (this.longitude !== null && this.longitude !== undefined) {
             const longitudeValue = parseFloat(this.longitude);
@@ -36,13 +37,16 @@ export class EventLocation {
             }
             this.longitude = longitudeValue; // Convertimos el valor a número si es válido
         }
-
+    
         // Validación para 'id_location'
-            if (!Number.isInteger(parseFloat(this.id_location))) {
-                return "Error: 'id_location' debe ser un número entero.";
-            }
-        
-
+        if (!isUpdate && (this.id_location === undefined || this.id_location === null)) {
+            return "Error: 'id_location' es un campo obligatorio.";
+        }
+        if (this.id_location !== undefined && (isNaN(parseFloat(this.id_location)) || !Number.isInteger(parseFloat(this.id_location)))) {
+            return "Error: 'id_location' debe ser un número entero válido y no puede ser nulo.";
+        }
+    
         return true;
     }
+    
 }

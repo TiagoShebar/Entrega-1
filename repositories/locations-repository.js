@@ -28,15 +28,16 @@ export class LocationRepository {
         var values = [id];
         const result = await this.DBClient.query(query, values);
         if(result.rowCount > 0){
-            query = "SELECT * FROM event_locations WHERE location_id = $1 LIMIT $2 OFFSET $3";
+            query = "SELECT * FROM event_locations WHERE id_location = $1 LIMIT $2 OFFSET $3";
             values = [id, limit, offset*limit];
             const result = await this.DBClient.query(query, values);
-            query = `SELECT COUNT(id) AS total FROM event_locations WHERE location_id = $1`;
+            query = `SELECT COUNT(id) AS total FROM event_locations WHERE id_location = $1`;
+            values = [id];
             const totalCount = await this.DBClient.query(query, values);
             return [result.rows,totalCount.rows[0].total];
         }
         else{
-            return [null, -1];
+            return [null, null];
         }
     }
 }

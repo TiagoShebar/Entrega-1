@@ -19,7 +19,7 @@ export class LocationService {
 
     async getEventLocationsByIdLocation(limit, offset, url, id){
         const [event_locations, totalCount] = await this.bd.getEventLocationsByLocationId(limit, offset, id);
-        return totalCount == -1 ? totalCount : Pagination.BuildPagination(event_locations, limit, offset, url, totalCount);
+        return totalCount === null ? false : Pagination.BuildPagination(event_locations, limit, offset, url, totalCount);
     }
 }
 

@@ -51,18 +51,18 @@ router.post("/", async (req, res) => {
     );
 
 
-    const verificacion = event_category.verifyObject();
+    const verificacion = event_category.verifyObject(false);
     if(verificacion !== true){
         return res.status(400).send(verificacion);
     }
 
     try {
         const event_categoryCreado = await eventCategoryService.createEventCategory(event_category);
-        if(event_categoryCreado === false){
-            return res.status(400).send("El nombre (name) está vacío o tiene menos de tres (3) letras");
+        if(event_categoryCreado === true){
+            return res.status(201).send();
         }
         else{
-            return res.status(201).send();
+            return res.status(400).send(event_categoryCreado);
         }
         
     }
@@ -79,6 +79,11 @@ router.put("/", async (req, res) => {
         req.body.display_order
     );
 
+    const verificacion = event_category.verifyObject(true);
+    if(verificacion !== true){
+        return res.status(400).send(verificacion);
+    }
+
     if(event_category.id === undefined){
         return res.status(400).send("id no puesto");
     }
@@ -88,7 +93,13 @@ router.put("/", async (req, res) => {
         if(result === false){
             return res.status(404).send();
         }
-        return res.status(200).send();
+        else if(result === true){
+            return res.status(200).send();
+        }
+        else{
+            return res.status(400).send(result);
+        }
+        
     }
     catch(error){
         return res.status(400).send(error);
@@ -96,7 +107,7 @@ router.put("/", async (req, res) => {
     
 });
 
-router.delete("/:id", AuthMiddleware, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     const id = req.params.id;
 
     try{
