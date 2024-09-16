@@ -1,4 +1,5 @@
 import express from "express";
+import cors from 'cors';
 import EventsController from './src/controllers/events-controller.js';
 import UsersController from './src/controllers/users-controller.js';
 import ProvincesController from './src/controllers/provinces-controller.js';
@@ -9,6 +10,12 @@ import EventLocationController from './src/controllers/event_location-controller
 const app = express(); //Init API REST
 app.use(express.json());
 const port = 3508;
+
+app.use(cors({
+    origin: 'http://localhost:3000', // Permite solicitudes desde este origen
+    methods: 'GET,POST,PUT,DELETE', // Métodos permitidos
+    allowedHeaders: 'Content-Type,Authorization' // Encabezados permitidos
+}));
 
 app.use("/api/event", EventsController);
 app.use("/api/user", UsersController);

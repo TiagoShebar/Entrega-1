@@ -6,6 +6,7 @@ export class EventsService {
     constructor() {
         this.bd = new EventRepository();
     }
+    
     async getEvent(offset, limit, tag, start_date, name, category, url){
 
         const regexFecha = /^\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2}:\d{2})?$/;
