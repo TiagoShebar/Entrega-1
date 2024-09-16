@@ -13,100 +13,98 @@ export class EventRepository {
 
     queryTraerEvento() {
         const query = `
-        SELECT 
-        e.id,
-        e.name,
-        e.description,
-        json_build_object (
-            'id', ec.id,
-            'name', ec.name
-        ) AS event_category,
-        json_build_object (
-            'id', el.id,
-            'name', el.name,
-            'full_address', el.full_address,
-            'latitude', el.latitude,
-            'longitude', el.longitude,
-            'max_capacity', el.max_capacity,
-            'location', json_build_object (
-                'id', l.id,
-                'name', l.name,
-                'latitude', l.latitude,
-                'longitude', l.longitude,
-                'max_capacity', el.max_capacity,
-                'province', json_build_object (
-                    'id', p.id,
-                    'name', p.name,
-                    'full_name', p.full_name,
-                    'latitude', p.latitude,
-                    'longitude', p.longitude,
-                    'display_order', p.display_order
-                )
-            )
-        ) AS event_location,
-        e.start_date,
-        e.duration_in_minutes,
-        e.price,
-        e.enabled_for_enrollment,
-        e.max_assistance,
-        json_build_object (
-            'id', u.id,
-            'username', u.username,
-            'first_name', u.first_name,
-            'last_name', u.last_name
-        ) AS creator_user,
-        (
-            SELECT json_agg(json_build_object('id', t.id, 'name', t.name))
-            FROM event_tags et
-            INNER JOIN tags t ON et.id_tag = t.id
-            WHERE et.id_event = e.id
-        ) AS tags
-    FROM 
-        events e
-    INNER JOIN 
-        event_categories ec ON e.id_event_category = ec.id
-    INNER JOIN 
-        event_locations el ON e.id_event_location = el.id
-    INNER JOIN 
-        locations l ON el.id_location = l.id
-    INNER JOIN 
-        provinces p ON l.id_province = p.id
-    INNER JOIN 
-        users u ON e.id_creator_user = u.id
-    LEFT JOIN 
-        event_tags et ON et.id_event = e.id
-    LEFT JOIN 
-        tags t ON et.id_tag = t.id
-    GROUP BY 
-        e.id, ec.id, el.id, l.id, p.id, u.id
-    LIMIT 10
-    OFFSET 0;
-    `;
+            SELECT DISTINCT ON (e.id)
+                e.id, 
+                e.name, 
+                e.description, 
+                json_build_object (
+                    'id', ec.id,
+                    'name', ec.name
+                ) AS event_category,
+                json_build_object (
+                    'id', el.id,
+                    'name', el.name,
+                    'full_address', el.full_address,
+                    'latitude', el.latitude,
+                    'longitude', el.longitude,
+                    'max_capacity', el.max_capacity,
+                    'location', json_build_object (
+                        'id', l.id,
+                        'name', l.name,
+                        'latitude', l.latitude,
+                        'longitude', l.longitude,
+                        'max_capacity', el.max_capacity,
+                        'province', json_build_object (
+                            'id', p.id,
+                            'name', p.name,
+                            'full_name', p.full_name,
+                            'latitude', p.latitude,
+                            'longitude', p.longitude,
+                            'display_order', p.display_order
+                        )
+                    )
+                ) AS event_location,
+                e.start_date, 
+                e.duration_in_minutes, 
+                e.price, 
+                e.enabled_for_enrollment, 
+                e.max_assistance, 
+                json_build_object (
+                    'id', u.id,
+                    'username', u.username,
+                    'first_name', u.first_name,
+                    'last_name', u.last_name
+                ) AS creator_user,
+                (
+                    SELECT json_agg(json_build_object('id', t.id, 'name', t.name))
+                    FROM event_tags et
+                    INNER JOIN tags t ON et.id_tag = t.id
+                    WHERE et.id_event = e.id
+                ) AS tags
+            FROM 
+                events e 
+            INNER JOIN 
+                event_categories ec ON e.id_event_category = ec.id 
+            INNER JOIN 
+                event_locations el ON e.id_event_location = el.id
+            INNER JOIN
+                locations l ON el.id_location = l.id
+            INNER JOIN
+                provinces p ON l.id_province = p.id
+            INNER JOIN
+                users u ON e.id_creator_user = u.id
+            LEFT JOIN 
+                event_tags et on et.id_event = e.id
+            LEFT JOIN
+                tags t on et.id_tag = t.id
+        `;
         return query;
     }
 
     async getEvent(mensajeCondicion, limit, offset) {
+
         var queryBase = this.queryTraerEvento() + `
             ${mensajeCondicion}
+            GROUP BY 
+                e.id, ec.id, el.id, l.id, p.id, u.id
             LIMIT $1
             OFFSET $2;
         `;
 
-        console.log(queryBase);
-
+        console.log("aaaaaaaaaaaaaaaa", queryBase);
         const values = [limit, offset*limit];
         const respuesta = await this.DBClient.query(queryBase, values);
-
+        
         queryBase = `
-        SELECT COUNT(DISTINCT e.id) AS total
-        FROM events e
-        INNER JOIN event_categories ec ON e.id_event_category = ec.id
+        SELECT COUNT(DISTINCT e.id) AS total 
+        FROM events e 
+        INNER JOIN event_categories ec ON e.id_event_category = ec.id 
         INNER JOIN event_locations el ON e.id_event_location = el.id
         INNER JOIN locations l ON el.id_location = l.id
         INNER JOIN provinces p ON l.id_province = p.id
         INNER JOIN users u ON e.id_creator_user = u.id
-        LEFT JOIN event_tags et ON et.id_event = e.id
-        LEFT JOIN tags t ON et.id_tag = t.id    
+        LEFT JOIN event_tags et on et.id_event = e.id
+        LEFT JOIN tags t on et.id_tag = t.id
         ${mensajeCondicion}
         `;
 

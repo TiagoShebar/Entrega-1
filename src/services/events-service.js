@@ -6,7 +6,7 @@ export class EventsService {
     constructor() {
         this.bd = new EventRepository();
     }
-    
+
     async getEvent(offset, limit, tag, start_date, name, category, url){
 
         const regexFecha = /^\d{4}-\d{2}-\d{2}(?:\s\d{2}:\d{2}:\d{2})?$/;
@@ -39,15 +39,18 @@ export class EventsService {
         }
 
         if(tag){
+            
             if(mensajeCondicion.includes("WHERE")){
                 mensajeCondicion += ` AND t.name = '${tag}'`;
             }
             else{
                 mensajeCondicion += ` WHERE t.name = '${tag}'`;
             }
+            
         }
-        
+        console.log(mensajeCondicion);
         const [eventos,totalCount] = await this.bd.getEvent(mensajeCondicion, limit, offset);
+        
         return Pagination.BuildPagination(eventos, limit, offset, url, totalCount);
     }
 

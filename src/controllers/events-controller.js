@@ -15,6 +15,8 @@ router.get("/", async (req, res) => {
     const name = req.query.name;
     const category = req.query.category;
 
+    
+
     let offset; 
     [limit, offset]= verifyPaginationResources(limit, page);
     if(isNaN(limit)){
