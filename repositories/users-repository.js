@@ -31,6 +31,7 @@ export class UserRepository {
 
     async validateUsername(user){
         try {
+            
             var query = "SELECT * FROM users WHERE username = $1";
             var values = [user.username];
             var respuesta = await this.DBClient.query(query, values);
@@ -38,12 +39,27 @@ export class UserRepository {
                 return false;
             }
             else{
+                console.log(user);
                 query = "INSERT INTO users (first_name, last_name, username, password) VALUES ($1, $2, $3, $4)";
                 values = [user.first_name, user.last_name, user.username, user.password];
                 respuesta = await this.DBClient.query(query, values);
                 return true;
             }
             
+        }
+        catch(error){
+            console.log(error);
+        }
+    }   
+    
+    async getUsernameById(id){
+        try{
+            const query = "SELECT username FROM users WHERE id = $1";
+            const values = [id];
+
+            const username = await this.DBClient.query(query,values);
+
+            return username.rows[0];
         }
         catch(error){
             console.log(error);

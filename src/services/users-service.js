@@ -15,4 +15,9 @@ export class UsersService{
         const resultado = await this.bd.validateUsername(user);
         return resultado;
     }
+
+    async GetUsernameById(id){
+        const username = await this.bd.getUsernameById(id);
+        return username;
+    }
 }

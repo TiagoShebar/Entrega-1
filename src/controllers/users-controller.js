@@ -2,6 +2,7 @@ import express from "express";
 import {UsersService} from "../services/users-service.js";
 import { User } from "../entities/user.js";
 import { verifyLength } from "../utils/functions.js"; 
+import { AuthMiddleware } from "../auth/AuthMiddleware.js";
 
 const router = express.Router();
 const userService = new UsersService();
@@ -81,5 +82,11 @@ const revisarCampos = (user) => {
     }
     return null;
 }
+
+router.get("/username", AuthMiddleware, async(req,res) => {
+    const id = req.user.id;
+    const username = await userService.GetUsernameById(id);
+    return res.status(200).json(username);
+});
 
 export default router;
