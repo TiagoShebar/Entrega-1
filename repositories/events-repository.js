@@ -91,7 +91,6 @@ export class EventRepository {
             OFFSET $2;
         `;
 
-        console.log("aaaaaaaaaaaaaaaa", queryBase);
         const values = [limit, offset*limit];
         const respuesta = await this.DBClient.query(queryBase, values);
         
@@ -170,10 +169,12 @@ export class EventRepository {
                     return [201, null];
                 }
                 else{
+                    
                     return [400, null];
                 }
             }
             else{
+                
                 return [400, "El max_assistance es mayor que el max_capacity del id_event_location."];
             }
         }

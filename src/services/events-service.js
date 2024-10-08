@@ -92,6 +92,7 @@ export class EventsService {
     async createEvent(event){
         const mensaje = this.verificarEvento(event);
         if(mensaje == null){
+            
             const [statusCode, mensaje] = await this.bd.createEvent(event);
             return [statusCode, mensaje];
         }
@@ -170,6 +171,7 @@ async updateEnrollment(id_event, enrollment_id, id_user, rating, observations) {
 */
     async insertEnrollment(id_event, id_user){
         const [statusCode, mensaje] = await this.bd.insertEnrollment(id_event, id_user);
+        console.log("haaaaa", statusCode, mensaje);
         return [statusCode, mensaje];
     }
 

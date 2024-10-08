@@ -13,7 +13,7 @@ const port = 3508;
 
 app.use(cors({
     origin: 'http://localhost:3000', // Permite solicitudes desde este origen
-    methods: 'GET,POST,PUT,DELETE', // Métodos permitidos
+    methods: 'GET,POST,PUT,DELETE,PATCH', // Métodos permitidos
     allowedHeaders: 'Content-Type,Authorization' // Encabezados permitidos
 }));
 

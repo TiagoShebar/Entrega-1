@@ -107,11 +107,12 @@ router.post("/", AuthMiddleware, async (req, res) => {
     );
     
     
+    
     const verificacion = event.verifyObject(false);
     if(verificacion !== true){
         return res.status(400).send(verificacion);
     }
-
+    
         const [statusCode, mensaje] = await eventService.createEvent(event);
         return res.status(statusCode).send(mensaje);
     
@@ -229,6 +230,7 @@ router.patch("/:id/enrollment/:rating", AuthMiddleware, async (req, res) => {
     const userId = req.user.id;
 
     const [statusCode, mensaje] = await eventService.uploadUserStuff(id_event, userId, observations, rating);
+    console.log(statusCode);
     return res.status(statusCode).send(mensaje);
 
 });
