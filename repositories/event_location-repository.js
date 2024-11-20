@@ -10,12 +10,12 @@ export class EventLocationRepository {
         this.DBClient.connect();
     }
 
-    async getAllEventLocations(userId, limit, offset) {
-        let query = `SELECT * FROM event_locations WHERE id_creator_user = $1 LIMIT $2 OFFSET $3`;
-        const result = await this.DBClient.query(query, [userId, limit, offset*limit]);
+    async getAllEventLocations(limit, offset) {
+        let query = `SELECT * FROM event_locations LIMIT $1 OFFSET $2`;
+        const result = await this.DBClient.query(query, [limit, offset*limit]);
 
-        query = "SELECT COUNT(id) AS total FROM event_locations WHERE id_creator_user = $1";
-        const totalCount = await this.DBClient.query(query, [userId]);
+        query = "SELECT COUNT(id) AS total FROM event_locations";
+        const totalCount = await this.DBClient.query(query);
 
         return [result.rows, totalCount.rows[0].total];
     }

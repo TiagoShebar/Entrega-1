@@ -8,8 +8,8 @@ export class EventLocationService {
         this.eventLocationRepository = new EventLocationRepository();
     }
 
-    async getAllEventLocations(userId, limit, offset, url) {
-        const [eventLocations,totalCount] = await this.eventLocationRepository.getAllEventLocations(userId, limit, offset);
+    async getAllEventLocations(limit, offset, url) {
+        const [eventLocations,totalCount] = await this.eventLocationRepository.getAllEventLocations(limit, offset);
         return Pagination.BuildPagination(eventLocations, limit, offset, url, totalCount);
     }
 

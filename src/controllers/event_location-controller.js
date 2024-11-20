@@ -9,7 +9,6 @@ const router = express.Router();
 const eventLocationService = new EventLocationService();
 
 router.get("/", AuthMiddleware, async (req, res) => {
-    const userId = req.user.id;
     let limit = req.query.limit;
     const page = req.query.page;
 
@@ -22,7 +21,7 @@ router.get("/", AuthMiddleware, async (req, res) => {
     }
 
     try {
-        const allEventLocations = await eventLocationService.getAllEventLocations(userId, limit, offset, req.originalUrl);
+        const allEventLocations = await eventLocationService.getAllEventLocations(limit, offset, req.originalUrl);
         return res.status(200).json(allEventLocations);
     } catch (error) {
         console.log(error);
