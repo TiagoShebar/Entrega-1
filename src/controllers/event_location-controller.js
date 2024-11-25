@@ -30,9 +30,9 @@ router.get("/", AuthMiddleware, async (req, res) => {
 });
 
 router.get("/:id", AuthMiddleware, async (req, res) => {
-    const userId = req.user.id;
     try {
-        const eventLocation = await eventLocationService.getEventLocationById(req.params.id, userId);
+        const eventLocation = await eventLocationService.getEventLocationById(req.params.id);
+        console.log(eventLocation);
         if (eventLocation) {
             return res.status(200).json(eventLocation);
         } else {
@@ -79,6 +79,7 @@ router.post("/", AuthMiddleware, async (req, res) => {
 });
 
 router.put("/", AuthMiddleware, async (req, res) => {
+    
     const eventLocation = new EventLocation(
         req.body.id,
         req.body.id_location,
@@ -86,8 +87,7 @@ router.put("/", AuthMiddleware, async (req, res) => {
         req.body.full_address,
         req.body.max_capacity,
         req.body.latitude,
-        req.body.longitude,
-        req.user.id
+        req.body.longitude
     );
 
     const verificacion = eventLocation.verifyObject(true);
@@ -104,6 +104,7 @@ router.put("/", AuthMiddleware, async (req, res) => {
         return res.status(statusCode).send(message);
         
     } catch (error) {
+        
         console.log(error);
         return res.status(400).send(error);
     }

@@ -13,8 +13,9 @@ export class EventLocationService {
         return Pagination.BuildPagination(eventLocations, limit, offset, url, totalCount);
     }
 
-    async getEventLocationById(id, userId) {
-        return await this.eventLocationRepository.getEventLocationById(id, userId);
+    async getEventLocationById(id) {
+        const eventLocation = await this.eventLocationRepository.getEventLocationById(id);
+        return eventLocation;
     }
 
     async createEventLocation(eventLocation) {

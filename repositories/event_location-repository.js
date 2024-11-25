@@ -20,9 +20,9 @@ export class EventLocationRepository {
         return [result.rows, totalCount.rows[0].total];
     }
 
-    async getEventLocationById(id, userId) {
-        const query = `SELECT * FROM event_locations WHERE id = $1 AND id_creator_user = $2`;
-        const result = await this.DBClient.query(query, [id, userId]);
+    async getEventLocationById(id) {
+        const query = `SELECT * FROM event_locations WHERE id = $1`;
+        const result = await this.DBClient.query(query, [id]);
         return result.rows[0];
     }
 
@@ -41,25 +41,16 @@ export class EventLocationRepository {
     }
 
     async updateEventLocation(eventLocation) {
-            let query = "SELECT * FROM event_locations WHERE id=$1 AND id_creator_user=$2";
-            const existeEventLocation = await this.DBClient.query(query, [eventLocation.id, eventLocation.id_creator_user]);
+            let query = "SELECT * FROM event_locations WHERE id=$1";
+            const existeEventLocation = await this.DBClient.query(query, [eventLocation.id]);
             if(existeEventLocation.rowCount > 0){
-                query = "SELECT * FROM locations WHERE id = $1";
-                const existeLocation = await this.DBClient.query(query, [eventLocation.id_location]);
-                if(existeLocation.rowCount > 0){
-                    const [attributes, valuesSet] = makeUpdate(eventLocation, {"id": eventLocation.id, "id_creator_user": eventLocation.id_creator_user});
+                    const [attributes, valuesSet] = makeUpdate(eventLocation, {"id": eventLocation.id});
                     if(attributes.length > 0){
-                        query = `UPDATE event_locations SET ${attributes.join(',')} WHERE id = $${valuesSet.length+1} AND id_creator_user = $${valuesSet.length+2}`;
-                        const result = await this.DBClient.query(query, [...valuesSet, eventLocation.id, eventLocation.id_creator_user]);
+                        query = `UPDATE event_locations SET ${attributes.join(',')} WHERE id = $${valuesSet.length+1}`;
+                        const result = await this.DBClient.query(query, [...valuesSet, eventLocation.id]);
                     }
                     return [200, null];
-                }else{
-                    return [400, "El id_location es inexistente"];
-                }
                 
-            }
-            else{
-                return [404, "el id del event_location es inexistente o no pertenece al usuario autenticado."];
             }
     }
         
